@@ -3,13 +3,25 @@ import { Form } from 'react-router-dom'
 import { extractFields } from '../helpers/formHelpers';
 import axios from 'axios';
 import fieldChecks from '../helpers/fieldChecks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [emailWarning, setEmailWarning] = useState('');
   const [passwordWarning, setPasswordWarning] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/`, {
+      withCredentials: true
+    })
+    .then(() => {
+      navigate('/home');
+    })
+    .catch(
+      // do nothing
+    )
+  }, [navigate])
 
   return (
     <div className="App">
@@ -21,7 +33,8 @@ function Login() {
           {
             headers: {
               'Content-Type': 'application/json' 
-            }
+            },
+            withCredentials: true
           })
           .then(res => {
             console.log(res.data);

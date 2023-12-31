@@ -4,15 +4,28 @@ import { Form, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import '../App.css'
 import { extractFields } from '../helpers/formHelpers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import fieldChecks from '../helpers/fieldChecks';
 
 function Root() {
   const [emailWarning, setEmailWarning] = useState('');
   const [passwordWarning, setPasswordWarning] = useState('');
-  const nagivate = useNavigate();
+  const navigate = useNavigate();
 
   console.log(emailWarning);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/`, {
+      withCredentials: true
+    })
+    .then(() => {
+      navigate('/home');
+    })
+    .catch(err =>
+      console.log(err)
+      // do nothing
+    )
+  }, [navigate]);
 
   return (
     <div className="App">
@@ -28,7 +41,7 @@ function Root() {
           })
           .then(res => {
             console.log(res.data);
-            nagivate('/login');
+            navigate('/login');
           })
           .catch(err => {
             console.log(err);

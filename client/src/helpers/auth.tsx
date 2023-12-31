@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import { Cookies } from "react-cookie";
 
 export function useAuth(){
     const [isAuth, setIsAuth] = useState(false);
-    const [cookies, ,] = useCookies(['connect.sid'])
+    const cookies = new Cookies(null, {path: '/'});
+    const sessionCookie = cookies.get('connect.sid');
+    console.log(document.cookie);
 
     useEffect(() => {
-        if (cookies["connect.sid"]){
+        if (sessionCookie){
             setIsAuth(true);
         }
         else{
             setIsAuth(false);
         }
-    }, [cookies]);
+    }, [sessionCookie]);
 
     return isAuth;
 }

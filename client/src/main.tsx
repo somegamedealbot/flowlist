@@ -9,7 +9,7 @@ import './index.css'
 import ErrorPage from './routes/error-page';
 import Login from './routes/login';
 import Home from './routes/home';
-import { Auth } from './routes/auth';
+// import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
   {
@@ -24,9 +24,8 @@ const router = createBrowserRouter([
   },
   {
     path: '/home',
-    element: <Auth>
-        <Home></Home>
-      </Auth>,
+    element: 
+        <Home></Home>,
     errorElement: <ErrorPage></ErrorPage>
   }
 ])
