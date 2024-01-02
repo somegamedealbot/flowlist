@@ -20,8 +20,9 @@ function Login() {
     })
     .catch(
       // do nothing
+      () => console.log('Not Auth')
     )
-  }, [navigate])
+  }, [navigate]);
 
   return (
     <div className="App">
