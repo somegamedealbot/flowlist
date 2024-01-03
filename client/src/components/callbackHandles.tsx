@@ -14,6 +14,10 @@ export function CallbackHandle({provider} : callbackProps){
         axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/user/${provider}-handle`, {
                 code: urlParams.get('code'),
                 state: urlParams.get('state')
+                
+            },
+            {
+                withCredentials: true
             }
         )
         .then(() => {
@@ -24,7 +28,7 @@ export function CallbackHandle({provider} : callbackProps){
             // or different error page tell user to go back home
             navigate('/home');
         })
-    })
+    }, [])
 
     return (
         <div>

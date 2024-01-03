@@ -4,7 +4,7 @@ function LinkYoutube(){
 
     return (<div>
         <button onClick={() => {
-            axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/spotify-url`, {
+            axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/youtube-url`, {
                 withCredentials: true
             })
             .then(result => {

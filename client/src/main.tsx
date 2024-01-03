@@ -9,6 +9,7 @@ import './index.css'
 import ErrorPage from './routes/error-page';
 import Login from './routes/login';
 import Home from './routes/home';
+import { CallbackHandle } from './components/callbackHandles';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -29,12 +30,19 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage></ErrorPage>
   },
   {
-    
+    path: '/spotify-callback',
+    element: 
+      <CallbackHandle provider='spotify'></CallbackHandle>
+  },
+  {
+    path: '/youtube-callback',
+    element: 
+      <CallbackHandle provider='youtube'></CallbackHandle>,
+    errorElement: <ErrorPage></ErrorPage>
   }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
-  </React.StrictMode>,
+  // add strict mode back in production
+  <RouterProvider router={router}></RouterProvider>,
 )
