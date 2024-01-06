@@ -10,6 +10,7 @@ import ErrorPage from './routes/error-page';
 import Login from './routes/login';
 import Home from './routes/home';
 import { CallbackHandle } from './components/callbackHandles';
+import Playlists from './routes/playlists';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -38,6 +39,16 @@ const router = createBrowserRouter([
     path: '/youtube-callback',
     element: 
       <CallbackHandle provider='youtube'></CallbackHandle>,
+    errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/youtube-playlists',
+    element: <Playlists apiService = 'youtube'></Playlists>,
+    errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/spotify-playlists',
+    element: <Playlists apiService = 'spotify'></Playlists>,
     errorElement: <ErrorPage></ErrorPage>
   }
 ])

@@ -21,12 +21,15 @@ function Home(){
       }, [navigate])
 
     return <div>
-        <div>
-            <LinkSpotify></LinkSpotify>
-            <LinkYoutube></LinkYoutube>
-            <LogoutBtn></LogoutBtn>
-            
-        </div>
+      <div>
+        <button onClick={() => navigate('/youtube-playlists')}>Youtube Playlists</button>
+        <button onClick={() => navigate('/spotify-playlists')}>Spotify Playlists</button>
+      </div>
+      <div>
+          <LinkSpotify></LinkSpotify>
+          <LinkYoutube></LinkYoutube>
+          <LogoutBtn></LogoutBtn>
+      </div>
     </div>
 }
 
