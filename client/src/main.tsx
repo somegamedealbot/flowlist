@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
@@ -10,7 +9,9 @@ import ErrorPage from './routes/error-page';
 import Login from './routes/login';
 import Home from './routes/home';
 import { CallbackHandle } from './components/callbackHandles';
-import Playlists from './routes/playlists';
+import {Playlists, Page} from './routes/playlists';
+import { Config } from './helpers/config';
+import { parseSpotifyPlaylist, parseYoutubePlaylist } from './helpers/parsePlaylistsData';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -44,11 +45,33 @@ const router = createBrowserRouter([
   {
     path: '/youtube-playlists',
     element: <Playlists apiService = 'youtube'></Playlists>,
+    children: [
+      {
+        path: '/youtube-playlists/:page/:token',
+        loader: async ({params}) => {
+          const response = await Config.axiosInstance().get(`/user/youtube-playlists/?pageToken=${params.token}`);
+          return parseYoutubePlaylist(response.data); 
+        },
+        element: <Page apiService='youtube'></Page>,
+        errorElement: <ErrorPage></ErrorPage>
+      }
+    ],
     errorElement: <ErrorPage></ErrorPage>
   },
   {
     path: '/spotify-playlists',
     element: <Playlists apiService = 'spotify'></Playlists>,
+    children: [
+      {
+        path: '/spotify-playlists/:page/:token',
+        loader: async ({params}) => {
+          const response = await Config.axiosInstance().get(`/user/spotify-playlists/?pageToken=${params.token}`);
+          return parseSpotifyPlaylist(response.data); 
+        },
+        element: <Page apiService='youtube' ></Page>,
+        errorElement: <ErrorPage></ErrorPage>
+      }
+    ],
     errorElement: <ErrorPage></ErrorPage>
   }
 ])
