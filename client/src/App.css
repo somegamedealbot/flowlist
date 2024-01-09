@@ -1,6 +1,6 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  margin: 0;
+  width: 100%;
   padding: 2rem;
   text-align: center;
 }
@@ -33,8 +33,119 @@
   }
 }
 
+.card__grid-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fill , 14.5rem [col-start]);
+  grid-auto-rows: auto;
+  /* width: 116rem; */
+}
+
 .card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+  width: 14.5rem;
+  height: 13rem;
   padding: 2em;
+}
+
+.card__container {
+  width: 100%;
+  height: 100%;
+  border-width: 2px;
+  border-color: black;
+  display: block;
+  margin: 0px auto;
+}
+
+.card__image-container{
+  position: relative;
+  width: 10rem ;
+  height: 10rem;
+  margin: auto;
+}
+
+.card__image {
+  border-radius: 10px;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.card__overlay-text-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.card__image-overlay-text{
+  /* display: inline-block; */
+  /* margin: auto; */
+}
+
+.card__image-overlay{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: 0.25s ease;
+  border-radius: 10px;
+  background-color: black;
+  z-index: 2;
+  align-items: center;
+}
+
+.card__image-container:hover .card__image-overlay{
+  opacity: 0.35;
+}
+
+.card__title{
+  width: 10rem;
+  margin: 0 auto;
+  padding: 1%;
+  text-align: left;
+  overflow: hidden;
+}
+
+.pagenation{
+
+}
+
+.pagenation__container{
+  margin: auto;
+  height: 4rem;
+  width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagenation__page{
+  display: inline-flex;
+  margin: 1rem;
+}
+
+.pagenation__nav-btn {
+  display: flex;
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 2rem;
+  width: 2rem;
+  justify-content: center;
+  align-items: center;  
+  /* align-content: center; */
+}
+
+.page-content{
+  width: 100%;
+  height: 100%;
 }
 
 .read-the-docs {

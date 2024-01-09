@@ -47,13 +47,17 @@ const router = createBrowserRouter([
     element: <Playlists apiService = 'youtube'></Playlists>,
     children: [
       {
-        path: '/youtube-playlists/:page/:token',
+        path: ':page/:token',
         loader: async ({params}) => {
           const response = await Config.axiosInstance().get(`/user/youtube-playlists/?pageToken=${params.token}`);
           return parseYoutubePlaylist(response.data); 
         },
         element: <Page apiService='youtube'></Page>,
         errorElement: <ErrorPage></ErrorPage>
+      },
+      {
+        path: '*',
+        element: <ErrorPage></ErrorPage>
       }
     ],
     errorElement: <ErrorPage></ErrorPage>
@@ -63,12 +67,12 @@ const router = createBrowserRouter([
     element: <Playlists apiService = 'spotify'></Playlists>,
     children: [
       {
-        path: '/spotify-playlists/:page/:token',
+        path: ':page/:token',
         loader: async ({params}) => {
           const response = await Config.axiosInstance().get(`/user/spotify-playlists/?pageToken=${params.token}`);
           return parseSpotifyPlaylist(response.data); 
         },
-        element: <Page apiService='youtube' ></Page>,
+        element: <Page apiService='spotify' ></Page>,
         errorElement: <ErrorPage></ErrorPage>
       }
     ],

@@ -18,13 +18,65 @@ interface StaticPageProps{
 }
 
 function StaticPage({pageData, apiService} : StaticPageProps){
-    // const [page, setPage] = useState(1);
+    const page = 1;
 
     console.log(pageData);
-    return <div>
-        <div>Your {`${apiService}`} Playlists</div>
-        <div>{pageData ? pageData.limit: 'no data'}</div>
-    </div>
+    const navigate = useNavigate();
+
+    const previousPage = () => {
+        if (pageData.prevPage){
+            navigate(`/${apiService}-playlists/${page + 1}/${pageData.nextPage}`);
+        }
+    }
+    
+    const nextPage = () => {
+        if (pageData.nextPage){
+            navigate(`/${apiService}-playlists/${page + 1}/${pageData.nextPage}`);
+        }
+    }
+
+    const renderPlaylists = () => {
+        return pageData.items.map((item) => {
+            return <div className="card" id={item.id}>
+            <div className="card__container">
+                <div className="card__image-container">
+                    <img className="card__image" src={item.imageUrl} alt={item.id + '-img'} />
+                    <a className="card__image-overlay">
+                        <div className="card__overlay-text-container">
+                            <span className="card__image-overlay-text">Convert</span>
+                        </div>
+                    </a>
+                </div>
+                <div className="card__title">
+                    <span>{item.title}</span>
+                </div>
+            </div>
+        </div>
+        })
+    };
+
+    if (pageData.items.length === 0){
+        return <div></div>
+    }
+    else{
+        return <div>
+            <div>Your {`${apiService}`} Playlists</div>
+            <div>{pageData ? pageData.limit: 'no data'}</div>
+            <div className="card__grid-container">
+                {renderPlaylists()}
+            </div>
+            <div>
+                <div className="pagenation__container">
+                    <button disabled={page > 1? false : true } className="pagenation__nav-btn" onClick={() => previousPage()}>&larr;</button>
+                        <div className="pagenation__page">
+                            <span>Page 1</span>
+                        </div>
+                    <button className="pagenation__nav-btn" onClick={() => nextPage()}>&rarr;</button>
+                </div>
+            </div>
+        </div>
+    }
+
 }
 
 export function Page({apiService} : PageProps){
@@ -77,7 +129,7 @@ export function Playlists({apiService} : PlaylistProps){
         
     }, [apiService, auth, navigate]);
     
-    return <div>
+    return <div className="page-content">
         <div>Playlists</div>
         <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
             apiService={apiService}></StaticPage>
