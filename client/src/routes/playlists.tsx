@@ -15,17 +15,17 @@ interface PageProps {
 interface StaticPageProps{
     pageData: Playlists,
     apiService: string,
+    page: number
 }
 
-function StaticPage({pageData, apiService} : StaticPageProps){
-    const page = 1;
+function StaticPage({pageData, apiService, page} : StaticPageProps){
 
     console.log(pageData);
     const navigate = useNavigate();
 
     const previousPage = () => {
         if (pageData.prevPage){
-            navigate(`/${apiService}-playlists/${page + 1}/${pageData.nextPage}`);
+            navigate(`/${apiService}-playlists/${page - 1}/${pageData.nextPage}`);
         }
     }
     
@@ -61,17 +61,16 @@ function StaticPage({pageData, apiService} : StaticPageProps){
     else{
         return <div>
             <div>Your {`${apiService}`} Playlists</div>
-            <div>{pageData ? pageData.limit: 'no data'}</div>
             <div className="card__grid-container">
                 {renderPlaylists()}
             </div>
             <div>
                 <div className="pagenation__container">
-                    <button disabled={page > 1? false : true } className="pagenation__nav-btn" onClick={() => previousPage()}>&larr;</button>
+                    <button disabled={pageData.prevPage ? false : true } className="pagenation__nav-btn" onClick={() => previousPage()}>&larr;</button>
                         <div className="pagenation__page">
-                            <span>Page 1</span>
+                            <span>Page {page}</span>
                         </div>
-                    <button className="pagenation__nav-btn" onClick={() => nextPage()}>&rarr;</button>
+                    <button disabled={pageData.nextPage ? false : true } className="pagenation__nav-btn" onClick={() => nextPage()}>&rarr;</button>
                 </div>
             </div>
         </div>
@@ -79,44 +78,49 @@ function StaticPage({pageData, apiService} : StaticPageProps){
 
 }
 
-export function Page({apiService} : PageProps){
+// export function Page({apiService} : PageProps){
     
-    const pageData : Playlists = useLoaderData() as Playlists;
-    const navigate = useNavigate();
-    const {page, } = useParams();
+//     const pageData : Playlists = useLoaderData() as Playlists;
+//     const navigate = useNavigate();
+//     const {page, } = useParams();
 
-    const previousPage = () => {
-        if (pageData.nextPage){
-            navigate(`/${apiService}-playlists/${page ? parseInt(page)  + 1 : ''}/${pageData.nextPage}`);
-        }
-    }
+//     const previousPage = () => {
+//         if (pageData.nextPage){
+//             navigate(`/${apiService}-playlists/${page ? parseInt(page)  + 1 : ''}/${pageData.nextPage}`);
+//         }
+//     }
     
-    const nextPage = () => {
-        if (pageData.prevPage){
-            navigate(`/${apiService}-playlists/${page ? parseInt(page) - 1 : ''}/${pageData.nextPage}`);
-        }
-    }
+//     const nextPage = () => {
+//         if (pageData.prevPage){
+//             navigate(`/${apiService}-playlists/${page ? parseInt(page) - 1 : ''}/${pageData.nextPage}`);
+//         }
+//     }
 
-    // console.log(pageData);
-    return <div>
-        <div>Your {`${apiService}`} Playlists</div>
-        <div>{pageData ? pageData.limit: 'no data'}</div>
-    </div>
-}
+//     // console.log(pageData);
+//     return <div>
+//         <div>Your {`${apiService}`} Playlists</div>
+//         <div>{pageData ? pageData.limit: 'no data'}</div>
+//     </div>
+// }
 
 export function Playlists({apiService} : PlaylistProps){
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylists | YoutubePlaylists>({} as SpotifyPlaylists);
-    
-    // const [totalItems, setTotalItems] = 
     const navigate = useNavigate();
+    const params = useParams();
     const auth = useAuth();
     
     useEffect(() => {
         if (auth === false){
             navigate('/login')
         }
-
-        Config.axiosInstance().get(`/user/${apiService}-playlists`)
+        let url = ''
+        if (Object.keys(params).length === 0 || params.page === '1'){
+            url = `/user/${apiService}-playlists`;
+        }
+        else {
+            url = `/user/${apiService}-playlists/?pageToken=${params.token}`
+        }
+        Config.axiosInstance().get(url)
         .then((res) => {
             setPlaylistsData(res.data);
         })
@@ -127,11 +131,11 @@ export function Playlists({apiService} : PlaylistProps){
             }
         })
         
-    }, [apiService, auth, navigate]);
+    }, [apiService, auth, navigate, params]);
     
     return <div className="page-content">
         <div>Playlists</div>
         <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
-            apiService={apiService}></StaticPage>
+            apiService={apiService} page={params.page ? parseInt(params.page) : 1}></StaticPage>
     </div>
 }
