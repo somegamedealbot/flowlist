@@ -53,14 +53,14 @@ const router = createBrowserRouter([
   },
   {
     path: '/convert-playlist/:type/:playlistId',
-    element: <ConvertPlaylist apiService = 'youtube'></ConvertPlaylist>,
+    element: <ConvertPlaylist></ConvertPlaylist>,
     errorElement: <ErrorPage></ErrorPage>
   },
-  {
-    path: '/convert-playlist/:type/:playlistId',
-    element: <ConvertPlaylist apiService = 'spotify'></ConvertPlaylist>,
-    errorElement: <ErrorPage></ErrorPage>
-  },
+  // {
+  //   path: '/convert-playlist/:type/:playlistId',
+  //   element: <ConvertPlaylist></ConvertPlaylist>,
+  //   errorElement: <ErrorPage></ErrorPage>
+  // },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

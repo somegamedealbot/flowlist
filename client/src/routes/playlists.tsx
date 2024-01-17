@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsePlaylistsData";
 
 interface PlaylistProps {
