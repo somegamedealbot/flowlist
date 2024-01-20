@@ -86,6 +86,7 @@ export type Playlist = {
     id: string,
     title: string,
     description?: string,
+    href: string,
     tracks: Track[]
 }
 
@@ -228,7 +229,8 @@ export function parseYoutubeTracks(playlist: ModdedYoutubePlaylist){
         id: playlist.id,
         title: playlist.snippet.localized.title,
         description: playlist.snippet.localized.description,
-        tracks: []
+        tracks: [],
+        href: `https://www.youtube.com/watch?v=${playlist.id}`
     }
     const tracks: Track[] = playlist.items.map((track) => {
         console.log(track.snippet.thumbnails)
@@ -260,6 +262,7 @@ export function parseSpotifyTracks(playlist: ModdedSpotifyPlaylist){
         id: playlist.id,
         title: playlist.name,
         description: playlist.description,
+        href: `https://open.spotify.com/track/${playlist.id}`,
         tracks: []
     }
     
@@ -276,11 +279,14 @@ export function parseSpotifyTracks(playlist: ModdedSpotifyPlaylist){
     return parsedPlaylist;
 }
 
-type SearchResults = {
-    results: {
-        primary: Track;
-        additional: Track[]
-    }[]
+export type TrackResult = {
+    primary: Track;
+    additional: Track[],
+    deleted: boolean
+}
+
+export type SearchResults = {
+    results: TrackResult[]
 }
 
 type SpotifySearchResults = {
@@ -289,7 +295,8 @@ type SpotifySearchResults = {
             href: string,
             items: SpotifyTrack[] 
         }
-    }[]
+        deleted? : boolean
+    }[],
 }
 
 type YoutubeSearchResults = {
@@ -316,9 +323,21 @@ type YoutubeSearchResults = {
 // }
 
 export function parseSpotifySearchResults(data: SpotifySearchResults){
-
     const playlist : SearchResults = {
         results: data.tracks.map((trackInfo) => {
+            if (trackInfo.deleted){
+                return {
+                    primary: {
+                        id: 'deleted-id',
+                        convertToken: 'deleted',
+                        title: 'deleted',
+                        url: '#',
+                        imageUrl: undefined
+                    },
+                    additional: [],
+                    deleted: true
+                }
+            }
             const primary = trackInfo.tracks.items[0];
             const additional = trackInfo.tracks.items;
             return {
@@ -337,7 +356,8 @@ export function parseSpotifySearchResults(data: SpotifySearchResults){
                         url: option.external_urls.spotify,
                         imageUrl: option.album.images[0] ? option.album.images[0].url : undefined
                     }
-                })
+                }),
+                deleted: false
             }
         })
     }
@@ -365,12 +385,32 @@ export function parseYoutubeSearchResults(data: YoutubeSearchResults){
                         url: `https://www.youtube.com/watch?v=${renderer.videoId}`,
                         imageUrl: renderer.thumbnail.thumbnails[0] ? renderer.thumbnail.thumbnails[0].url : undefined
                     }
-                })
+                }),
+                deleted: false
             }
         })
     }
 
     return playlist
+}
+
+type ConvertData = {
+    private: boolean,
+    title: string,
+    description? : string,
+    tracks: string[]
+}
+
+export function toConvertData(searchData : SearchResults){
+    const convertData : ConvertData = {
+        private: false,
+        title: 'test playlist',
+        description: 'test description',
+        tracks: searchData.results.map((trackData) => {
+            return trackData.primary.convertToken
+        })
+    }
+    return convertData;
 }
 
 export function extractSearchTokens(playlistData: Playlist){
