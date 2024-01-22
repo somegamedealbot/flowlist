@@ -22,7 +22,7 @@ async function convert(apiService : string, convertData : object){
         type: apiService
     }).toString()}`, convertData)
     .then((res) => {
-        const playlistId = res.data;
+        const playlistId = res.data.id;
         return playlistId;
     })
     .catch((err) => {
@@ -217,10 +217,8 @@ function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
             // const body = Object.fromEntries(input);
             const playlistId = await convert(apiService, body);
             if (playlistId){
-                navigate(`/converted?${new URLSearchParams({
-                    id: playlistId,
-                    type: getConvertedType(apiService)
-                })}`)
+                navigate(`/converted/${getConvertedType(apiService)}/
+                    ${playlistId}`);
             }
             console.log(body);
         }}>

@@ -11,7 +11,7 @@ export function Converted(){
     const params = useParams();
     const navigate = useNavigate();
 
-    if (!params.id || !params.type){
+    if (params.id === undefined || params.type === undefined){
         throw new Error('No playlist id given');
     }
 

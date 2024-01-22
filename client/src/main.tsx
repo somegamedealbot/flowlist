@@ -58,7 +58,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage></ErrorPage>
   },
   {
-    path: '/converted',
+    path: '/converted/:type/:id',
     element: <Converted></Converted>,
     errorElement: <ErrorPage></ErrorPage>
   }
