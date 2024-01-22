@@ -394,7 +394,7 @@ export function parseYoutubeSearchResults(data: YoutubeSearchResults){
     return playlist
 }
 
-type ConvertData = {
+export type ConvertData = {
     private: boolean,
     title: string,
     description? : string,

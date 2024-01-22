@@ -11,6 +11,7 @@ import Home from './routes/home';
 import { CallbackHandle } from './components/callbackHandles';
 import {Playlists} from './routes/playlists';
 import { ConvertPlaylist } from './routes/convertPlaylist';
+import { Converted } from './routes/converted';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -56,6 +57,11 @@ const router = createBrowserRouter([
     element: <ConvertPlaylist></ConvertPlaylist>,
     errorElement: <ErrorPage></ErrorPage>
   },
+  {
+    path: '/converted',
+    element: <Converted></Converted>,
+    errorElement: <ErrorPage></ErrorPage>
+  }
   // {
   //   path: '/convert-playlist/:type/:playlistId',
   //   element: <ConvertPlaylist></ConvertPlaylist>,

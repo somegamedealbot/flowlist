@@ -4,12 +4,36 @@ import { Config } from "../helpers/config";
 import { Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSpotifySearchResults, parseYoutubeSearchResults} from "../helpers/parsePlaylistsData";
 import { useAuth } from "../components/auth";
 
-type ConvertProps = {
-    apiService: string
+// type ConvertProps = {
+//     apiService: string
+// }
+
+function getConvertedType(apiService : string){
+    if (apiService === 'spotify'){
+        return 'youtube';
+    }
+    return 'spotify';
+}
+
+async function convert(apiService : string, convertData : object){
+    apiService = getConvertedType(apiService);
+    
+    return await Config.axiosInstance().post(`user/convert?${new URLSearchParams({
+        type: apiService
+    }).toString()}`, convertData)
+    .then((res) => {
+        const playlistId = res.data;
+        return playlistId;
+    })
+    .catch((err) => {
+        console.log(err);
+        return undefined;
+        // throw new Error('unable to create playlist');
+    })
 }
 
 async function getConvertedData(apiService: string, searchTokens: string[]){
-    let searchResult = await Config.axiosInstance().post(`user/convert-data?${new URLSearchParams({
+    const searchResult = await Config.axiosInstance().post(`user/convert-data?${new URLSearchParams({
         type: apiService
     }).toString()}`, {searchTokens: searchTokens})
     .then((res) => {
@@ -38,7 +62,7 @@ export function ConvertPlaylist(){
     const [converted, setConverted] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!auth){
+        if (auth === false){
             navigate('/login');
         }
 
@@ -109,7 +133,7 @@ export function ConvertPlaylist(){
                             </div>
                         </div>
                     </div>
-                    <CreatePlaylistForm converted={converted} tracksData={searchResult}></CreatePlaylistForm>
+                    <CreatePlaylistForm apiService={params.type ? params.type : ''} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
                 </div>
                 <div className="margin-spacing"></div>
                 <div className="track-list">
@@ -168,23 +192,35 @@ function Track({track, trackResult, index} : TrackProp){
 interface FormProps {
     tracksData : SearchResults
     converted : boolean
+    apiService : string
 }
 
-function CreatePlaylistForm({tracksData, converted} : FormProps){
+function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
+    const navigate = useNavigate();
+    
     return <div className="convert-page__form">
-        <form action="" method="post" onSubmit={(e) => {
+        <form action="" method="post" onSubmit={async (e) => {
             e.preventDefault();
             const input = new FormData(e.currentTarget);
             // console.log(input);
             const body = {
-                title: input.get('title'),
-                description: input.get('description'),
+                title: input.get('title')?.toString() ? input.get('title')?.toString() : '',
+                description: input.get('description') ? input.get('description') : undefined,
+                private: input.get('private') === 'on' ? true : false,
                 tracks: tracksData.results.map((track) => {
                     return {
                         convertToken: track.primary.convertToken,
                         deleted: track.deleted
                     };
                 }) 
+            }
+            // const body = Object.fromEntries(input);
+            const playlistId = await convert(apiService, body);
+            if (playlistId){
+                navigate(`/converted?${new URLSearchParams({
+                    id: playlistId,
+                    type: getConvertedType(apiService)
+                })}`)
             }
             console.log(body);
         }}>
@@ -202,7 +238,7 @@ function CreatePlaylistForm({tracksData, converted} : FormProps){
             </div>
             <div>
                 
-                <label htmlFor="description">Private:</label>
+                <label htmlFor="private">Private:</label>
                 <input defaultChecked={true} type='checkbox' name="private"></input>
             </div>
             <button type="submit" disabled={converted ? false : true}>Create Playlist</button>
