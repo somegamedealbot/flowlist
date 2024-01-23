@@ -218,7 +218,7 @@ function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
             const playlistId = await convert(apiService, body);
             if (playlistId){
                 navigate(`/converted/${getConvertedType(apiService)}/
-                    ${playlistId}`);
+                    ${playlistId.trim()}`);
             }
             console.log(body);
         }}>

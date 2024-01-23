@@ -313,9 +313,8 @@ type YoutubeSearchResults = {
                     text: string
                 }[]
             },
-
-        }[],
-    }[]
+        },
+    }[][]
 }
 
 // type YoutubeSearchResults = {
@@ -367,8 +366,8 @@ export function parseSpotifySearchResults(data: SpotifySearchResults){
 export function parseYoutubeSearchResults(data: YoutubeSearchResults){
     const playlist : SearchResults = {
         results: data.tracks.map((track) => {
-            const primary = track.videoRenderer[0];
-            const additional = track.videoRenderer;
+            const primary =  track[0].videoRenderer;
+            const additional = track;
             return {
                 primary: {
                     id: primary.videoId,
@@ -377,7 +376,8 @@ export function parseYoutubeSearchResults(data: YoutubeSearchResults){
                     url: `https://www.youtube.com/watch?v=${primary.videoId}`,
                     imageUrl: primary.thumbnail.thumbnails[0] ? primary.thumbnail.thumbnails[0].url : undefined
                 },
-                additional: additional.map((renderer) => {
+                additional: additional.map((alt) => {
+                    const renderer = alt.videoRenderer; 
                     return {
                         id: renderer.videoId,
                         convertToken: renderer.videoId,

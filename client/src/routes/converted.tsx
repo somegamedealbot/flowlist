@@ -21,7 +21,7 @@ export function Converted(){
 
     const playlistUrl = params.type === 'spotify' ? 
     `https://open.spotify.com/playlist/${params.id}` : 
-    `https://www.youtube.com/playlist?list=${params.id}`
+    `https://www.youtube.com/playlist?list=${params.id.trim()}`
 
     return <div>
         <div>Your playlist has been successfully converted</div>
