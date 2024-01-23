@@ -10,8 +10,8 @@ import Login from './routes/login';
 import Home from './routes/home';
 import { CallbackHandle } from './components/callbackHandles';
 import {Playlists} from './routes/playlists';
-import { Config } from './helpers/config';
-import { parseSpotifyPlaylist, } from './helpers/parsePlaylistsData';
+import { ConvertPlaylist } from './routes/convertPlaylist';
+import { Converted } from './routes/converted';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -51,23 +51,22 @@ const router = createBrowserRouter([
     path: '/spotify-playlists/:page?/:token?',
     element: <Playlists apiService = 'spotify'></Playlists>,
     errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/convert-playlist/:type/:playlistId',
+    element: <ConvertPlaylist></ConvertPlaylist>,
+    errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/converted/:type/:id',
+    element: <Converted></Converted>,
+    errorElement: <ErrorPage></ErrorPage>
   }
   // {
-  //   path: '/spotify-playlists',
-  //   element: <Playlists apiService = 'spotify'></Playlists>,
-  //   children: [
-  //     {
-  //       path: ':page/:token',
-  //       loader: async ({params}) => {
-  //         const response = await Config.axiosInstance().get(`/user/spotify-playlists/?pageToken=${params.token}`);
-  //         return parseSpotifyPlaylist(response.data); 
-  //       },
-  //       element: <Page apiService='spotify' ></Page>,
-  //       errorElement: <ErrorPage></ErrorPage>
-  //     }
-  //   ],
+  //   path: '/convert-playlist/:type/:playlistId',
+  //   element: <ConvertPlaylist></ConvertPlaylist>,
   //   errorElement: <ErrorPage></ErrorPage>
-  // }
+  // },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

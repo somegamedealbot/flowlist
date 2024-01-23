@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react"
 import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsePlaylistsData";
 
 interface PlaylistProps {
-    apiService: string
-}
-
-interface PageProps {
     apiService: string
 }
 
@@ -41,7 +37,7 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
             <div className="card__container">
                 <div className="card__image-container">
                     <img className="card__image" src={item.imageUrl} alt={item.id + '-img'} />
-                    <a className="card__image-overlay">
+                    <a className="card__image-overlay" onClick={() => navigate(`/convert-playlist/${apiService}/${item.id}`)}>
                         <div className="card__overlay-text-container">
                             <span className="card__image-overlay-text">Convert</span>
                         </div>
@@ -78,31 +74,6 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
 
 }
 
-// export function Page({apiService} : PageProps){
-    
-//     const pageData : Playlists = useLoaderData() as Playlists;
-//     const navigate = useNavigate();
-//     const {page, } = useParams();
-
-//     const previousPage = () => {
-//         if (pageData.nextPage){
-//             navigate(`/${apiService}-playlists/${page ? parseInt(page)  + 1 : ''}/${pageData.nextPage}`);
-//         }
-//     }
-    
-//     const nextPage = () => {
-//         if (pageData.prevPage){
-//             navigate(`/${apiService}-playlists/${page ? parseInt(page) - 1 : ''}/${pageData.nextPage}`);
-//         }
-//     }
-
-//     // console.log(pageData);
-//     return <div>
-//         <div>Your {`${apiService}`} Playlists</div>
-//         <div>{pageData ? pageData.limit: 'no data'}</div>
-//     </div>
-// }
-
 export function Playlists({apiService} : PlaylistProps){
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylists | YoutubePlaylists>({} as SpotifyPlaylists);
     const navigate = useNavigate();
@@ -135,6 +106,7 @@ export function Playlists({apiService} : PlaylistProps){
     
     return <div className="page-content">
         <div>Playlists</div>
+        <button onClick={() => navigate('/home')}>Home</button>
         <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
             apiService={apiService} page={params.page ? parseInt(params.page) : 1}></StaticPage>
     </div>
