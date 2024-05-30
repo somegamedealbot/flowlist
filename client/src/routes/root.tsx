@@ -1,18 +1,18 @@
 
 // import { useState } from 'react'
-import { Form, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import '../App.css'
-import { extractFields } from '../helpers/formHelpers';
-import { useEffect, useState } from 'react';
-import fieldChecks from '../helpers/fieldChecks';
+// import { extractFields } from '../helpers/formHelpers';
+import { useEffect } from 'react';
+// import fieldChecks from '../helpers/fieldChecks';
 
 function Root() {
-  const [emailWarning, setEmailWarning] = useState('');
-  const [passwordWarning, setPasswordWarning] = useState('');
+  // const [emailWarning, setEmailWarning] = useState('');
+  // const [passwordWarning, setPasswordWarning] = useState('');
   const navigate = useNavigate();
 
-  console.log(emailWarning);
+  // console.log(emailWarning);
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/`, {
@@ -29,56 +29,25 @@ function Root() {
 
   return (
     <div className="App">
-      <Form method='post' onSubmit={
-        (e) => {
-          e.preventDefault();
-          const fieldRecord = extractFields(e.target)
-          axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/signup`, JSON.stringify(fieldRecord),
-          {
-            headers: {
-              'Content-Type': 'application/json' 
-            }
-          })
-          .then(res => {
-            console.log(res.data);
-            navigate('/login');
-          })
-          .catch(err => {
-            console.log(err);
-            // display error here
-          })
-        }
-      }>
-        <div>
-            <label htmlFor='email'>Email</label>
-            <div>
-              <input type='text' name='email' 
-                onChange={
-                  (e) => {setEmailWarning(fieldChecks.emailCheck(e.target.value))}
-                }>
-                </input>
+      <nav className='block static '>
+        <div className='h-4/5'>
+          <div className='flex h-20 px-4'>
+            <div className='w-44 flex items-center'>
+              <div>Flowlist</div>
             </div>
-            {emailWarning.length !== 0 ? <div>{emailWarning}</div> : null}
-        </div>
-        <div>
-            <label htmlFor='password'>Password</label>
-            <div>
-              <input type='password' name='password' 
-                onChange={
-                  (e) => setPasswordWarning(fieldChecks.PasswordCheck(e.target.value, false))
-                }>
-                </input>
+            <div className='ml-10 w-1/2 flex items-center'></div>
+            <div className='grow h-0'></div>
+            <div className='min-w-min w-auto flex items-center'>
+              <div className='mr-6'>
+                <a href="/signup"><button>Sign Up</button></a>
+              </div>
+              <div>
+                <a href='/login'><button>Login</button></a>
+              </div>
             </div>
-            {passwordWarning.length !== 0 ? <div>{passwordWarning}</div> : null}
+          </div>
         </div>
-        <div>
-            <button type='submit'>Sign Up</button>
-        </div>
-      </Form>
-
-      <div>
-        <a href='/login'>Login</a>
-      </div>
+      </nav>
     </div>
   )
 }
