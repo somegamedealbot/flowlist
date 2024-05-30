@@ -12,12 +12,18 @@ import { CallbackHandle } from './components/callbackHandles';
 import {Playlists} from './routes/playlists';
 import { ConvertPlaylist } from './routes/convertPlaylist';
 import { Converted } from './routes/converted';
+import SignUp from './routes/sign-up';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root></Root>,
+    errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/signup',
+    element: <SignUp></SignUp>,
     errorElement: <ErrorPage></ErrorPage>
   },
   {
