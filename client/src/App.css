@@ -1,7 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
 #root {
   margin: 0;
   width: 100%;
-  padding: 0.75rem;
+  /* padding: 0.75rem; */
   box-sizing: border-box;
   text-align: center;
   height: 100%;
