@@ -13,6 +13,7 @@ import {Playlists} from './routes/playlists';
 import { ConvertPlaylist } from './routes/convertPlaylist';
 import { Converted } from './routes/converted';
 import SignUp from './routes/sign-up';
+import { Fonts } from './components/fonts'
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -77,5 +78,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // add strict mode back in production
-  <RouterProvider router={router}></RouterProvider>,
+  <div>
+    <Fonts></Fonts>
+    <RouterProvider router={router}></RouterProvider>
+  </div>
 )
