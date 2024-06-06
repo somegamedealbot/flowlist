@@ -5,7 +5,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+      
+    },
+    extend: {
+      boxShadow: {
+        'lg-card': '4px 6px -1px rgba(205, 120, 245, 0.3)'
+      }
+    },
   },
   plugins: [],
 }
