@@ -12,12 +12,19 @@ import { CallbackHandle } from './components/callbackHandles';
 import {Playlists} from './routes/playlists';
 import { ConvertPlaylist } from './routes/convertPlaylist';
 import { Converted } from './routes/converted';
+import SignUp from './routes/sign-up';
+import { Fonts } from './components/fonts'
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root></Root>,
+    errorElement: <ErrorPage></ErrorPage>
+  },
+  {
+    path: '/signup',
+    element: <SignUp></SignUp>,
     errorElement: <ErrorPage></ErrorPage>
   },
   {
@@ -48,7 +55,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage></ErrorPage>
   },
   {
-    path: '/spotify-playlists/:page?/:token?',
+    path: '/spotify-playlists/:page?/:token?', // ISSUE WITH ROUTE MATCHING MATCHING FOR TOKEN
     element: <Playlists apiService = 'spotify'></Playlists>,
     errorElement: <ErrorPage></ErrorPage>
   },
@@ -71,5 +78,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // add strict mode back in production
-  <RouterProvider router={router}></RouterProvider>,
+  <div>
+    <Fonts></Fonts>
+    <RouterProvider router={router}></RouterProvider>
+  </div>
 )

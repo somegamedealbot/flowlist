@@ -1,15 +1,18 @@
-import '../App.css'
-import { Form } from 'react-router-dom'
-import { extractFields } from '../helpers/formHelpers';
-import axios from 'axios';
-import fieldChecks from '../helpers/fieldChecks';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function Login() {
+// import { useState } from 'react'
+import { Form, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import '../App.css'
+import { extractFields } from '../helpers/formHelpers';
+import { useEffect, useState } from 'react';
+import fieldChecks from '../helpers/fieldChecks';
+
+function SignUp() {
   const [emailWarning, setEmailWarning] = useState('');
   const [passwordWarning, setPasswordWarning] = useState('');
   const navigate = useNavigate();
+
+  console.log(emailWarning);
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/`, {
@@ -18,9 +21,9 @@ function Login() {
     .then(() => {
       navigate('/home');
     })
-    .catch(
+    .catch(err =>
+      console.log(err)
       // do nothing
-      () => console.log('Not Auth')
     )
   }, [navigate]);
 
@@ -32,21 +35,20 @@ function Login() {
         </div>
         <div className='h-full'>
           <div className='login-container'>
-            <div className='mt-2 text-2xl mb-8'>Login</div>
+            <div className='mt-2 text-2xl mb-8'>Sign Up</div>
             <Form className='mx-auto w-full' method='post' onSubmit={
               (e) => {
                 e.preventDefault();
                 const fieldRecord = extractFields(e.target)
-                axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/login`, JSON.stringify(fieldRecord),
+                axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/signup`, JSON.stringify(fieldRecord),
                 {
                   headers: {
                     'Content-Type': 'application/json' 
-                  },
-                  withCredentials: true
+                  }
                 })
                 .then(res => {
                   console.log(res.data);
-                  navigate('/home');
+                  navigate('/login');
                 })
                 .catch(err => {
                   console.log(err);
@@ -68,25 +70,25 @@ function Login() {
                   {emailWarning.length !== 0 ? <div>{emailWarning}</div> : null}
               </div>
               <div className='h-5'></div>
-              <div className=''>
-                <div className='mb-2'>
-                  <label htmlFor='password'>Password</label>
-                </div>
+              <div>
+                  <div className='mb-2'>
+                    <label htmlFor='password'>Password</label>
+                  </div>
                   <div>
                     <input className='px-2 rounded h-8' type='password' name='password' 
                       onChange={
-                        (e) => setPasswordWarning(fieldChecks.PasswordCheck(e.target.value, true))
+                        (e) => setPasswordWarning(fieldChecks.PasswordCheck(e.target.value, false))
                       }>
                       </input>
                   </div>
                   {passwordWarning.length !== 0 ? <div>{passwordWarning}</div> : null}
               </div>
               <div className='mt-8'>
-                <button type='submit'>Login</button>
+                  <button type='submit'>Sign Up</button>
               </div>
             </Form>
             <div className='mt-10'>
-              <a href='/signup'>Don't have an account? Create one here</a>
+              <a href='/login'>Already have an account? Create one here</a>
             </div>
           </div>
         </div>
@@ -95,4 +97,4 @@ function Login() {
   )
 }
 
-export default Login
+export default SignUp

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import { Config } from "../helpers/config";
 import { Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSpotifySearchResults, parseYoutubeSearchResults} from "../helpers/parsePlaylistsData";
 import { useAuth } from "../components/auth";
+import { EditModal } from "../components/editModal";
 
 // type ConvertProps = {
 //     apiService: string
@@ -53,6 +54,15 @@ async function getConvertedData(apiService: string, searchTokens: string[]){
     return searchResult;
 }
 
+interface EditContextObj {
+    editing: boolean,
+    setEditing: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const EditContext = createContext({
+    editing: false
+} as EditContextObj);
+
 export function ConvertPlaylist(){
     const params = useParams();
     const auth = useAuth();
@@ -60,6 +70,7 @@ export function ConvertPlaylist(){
     const [playlistData, setPlaylistData] = useState<Playlist>({} as Playlist);
     const [searchResult, setSearchResults] = useState<SearchResults>({} as SearchResults);
     const [converted, setConverted] = useState<boolean>(false);
+    const [editing, setEditing] = useState<boolean>(false);
 
     useEffect(() => {
         if (auth === false){
@@ -94,60 +105,67 @@ export function ConvertPlaylist(){
         return <div></div>
     }
     else {
-        return <div className="convert-page">
-            <div className="background-image-container">
-                <img className="background-image" src={playlistData.imageUrl}></img>
-            </div>
-            <div className="nav">
-                <button onClick={() => navigate(-1)}>&larr;</button>
-                <button onClick={() => navigate('/home')}>Home</button>
-            </div>
-            <div className="convert-content">
-                <div className="convert-page__info-container">
-                    <div className="playlist-info">
-                        <div className="playlist-info__img-container">
-                            <img className="playlist-info__playlist-img" src={playlistData.imageUrl} alt="playlist-info__playlist-img"/>
-                        </div>
-                        <div className="playlist-info__info-container">
-                            <div className="playlist-info__title">
-                                <a href={playlistData.href}>{playlistData.title}</a>
+        return <div>
+            <EditModal editing={editing} setEditing={setEditing}></EditModal>
+            <div className="convert-page">
+                <div className="background-image-container">
+                    <img className="background-image" src={playlistData.imageUrl}></img>
+                </div>
+                <div className="nav">
+                    <button onClick={() => navigate(-1)}>&larr;</button>
+                    <button onClick={() => navigate('/home')}>Home</button>
+                </div>
+                <div className="convert-content">
+                    <div className="convert-page__info-container">
+                        <div className="playlist-info">
+                            <div className="playlist-info__img-container">
+                                <img className="playlist-info__playlist-img" src={playlistData.imageUrl} alt="playlist-info__playlist-img"/>
                             </div>
-                            <div className="playlist-info__track-count">{playlistData.tracks.length + ' Tracks'}</div>
-                            {/* <div className="playlist-info__id">id: {playlistData.id}</div> */}
-                            {/* {playlistData.description ? <p className="playlist-info__description">{playlistData.description}</p> : <div></div>} */}
-                            <div className="convert-button">
-                                <button onClick={async () => {
-                                    if (params.type){
-                                        const result = await getConvertedData(params.type, extractSearchTokens(playlistData));
-                                        setConverted(true);
-                                        console.log(result);
-                                        setSearchResults(result);
-                                    }
-                                    else {
-                                        throw Error('no playlist type given');
-                                    }
+                            <div className="playlist-info__info-container">
+                                <div className="playlist-info__title">
+                                    <a href={playlistData.href}>{playlistData.title}</a>
+                                </div>
+                                <div className="playlist-info__track-count">{playlistData.tracks.length + ' Tracks'}</div>
+                                {/* <div className="playlist-info__id">id: {playlistData.id}</div> */}
+                                {/* {playlistData.description ? <p className="playlist-info__description">{playlistData.description}</p> : <div></div>} */}
+                                <div className="convert-button">
+                                    <button onClick={async () => {
+                                        if (params.type){
+                                            const result = await getConvertedData(params.type, extractSearchTokens(playlistData));
+                                            setConverted(true);
+                                            console.log(result);
+                                            setSearchResults(result);
+                                        }
+                                        else {
+                                            throw Error('no playlist type given');
+                                        }
 
-                                }}>
-                                    Convert
-                                </button>
+                                    }}>
+                                        Convert
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                        <CreatePlaylistForm apiService={params.type ? params.type : ''} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
                     </div>
-                    <CreatePlaylistForm apiService={params.type ? params.type : ''} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
+                    <div className="margin-spacing"></div>
+                    <div className="track-list">
+                        <EditContext.Provider value = {{editing, setEditing}}>
+                            {<TracksDisplay tracks={playlistData.tracks} searchResults={searchResult}></TracksDisplay>}
+                        </EditContext.Provider>
+                    </div>
                 </div>
-                <div className="margin-spacing"></div>
-                <div className="track-list">
-                    {<TracksDisplay tracks={playlistData.tracks} searchResults={searchResult}></TracksDisplay>}
-                </div>
+                
             </div>
-            
-        </div>
+        </div> 
+        
     }
 }
 
 interface TracksProps {
     tracks: Track[]
-    searchResults: SearchResults
+    searchResults: SearchResults,
+    // setEditing: 
 }
 
 interface TrackProp {
@@ -168,6 +186,7 @@ function TracksDisplay({tracks, searchResults} : TracksProps){
 }
 
 function Track({track, trackResult, index} : TrackProp){
+    const {editing, setEditing} = useContext(EditContext);
     return <div id={track.id} className="track-list__row">
         <div className="track-list__position">{index + 1}</div>
         <div className="track-list__image-col">
@@ -185,7 +204,10 @@ function Track({track, trackResult, index} : TrackProp){
                 trackResult ? trackResult.primary.url : '#'    
             }>{trackResult ? trackResult.primary.title : 'Title'}</a>
         </div>
-        <div className="track-list__small-col"><button>Edit</button></div>
+        <div onClick={() => {
+            setEditing(true);
+            console.log('set edit')
+        }} className="track-list__small-col"><button>Edit</button></div>
     </div>
 }
 

@@ -168,7 +168,7 @@ export function parseSpotifyPlaylist(playlists: SpotifyPlaylists){
 
     parsedPlaylists.items = playlists.items.map<PlaylistOverview>((item) => {
         const overview: PlaylistOverview = {
-            imageUrl: item.images[0] ? item.images[0].url : undefined,
+            imageUrl: item.images ? item.images[0] ? item.images[0].url : undefined : undefined,
             id: item.id,
             title: item.name,
             description: item.description
