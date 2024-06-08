@@ -1,16 +1,9 @@
 
-// import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import '../App.css'
-// import { extractFields } from '../helpers/formHelpers';
 import { useEffect } from 'react';
 import { SpotifySvg, YoutubeSvg, SelectSvg, ConnectSvg, DoubleArrowSvg, CircleArrowsSvg} from '../components/icons'
-// import spotifySvg from '../assets/spotify-svgrepo-com.svg'
-// import youtubeSvg from '../assets/youtube-svgrepo-com.svg'
-// import doubleArrowSvg from '../assets/double-arrow-svgrepo-com.svg'
-
-// import fieldChecks from '../helpers/fieldChecks';
 
 function Root() {
   // const [emailWarning, setEmailWarning] = useState('');
@@ -34,10 +27,10 @@ function Root() {
 
   return (
     <div className="App">
-      <nav className='block static 100vw outline outline-1 outline-white'>
+      <nav className='block static 100vw outline outline-1 outline-cyan-500'>
         <div className='h-4/5'>
           <div className='flex h-20 px-4'>
-            <div className='w-44 flex items-center'>
+            <div className='w-36 flex items-center'>
               <div className='mx-auto text-3xl text-purple-500'>Flowlist</div>
             </div>
             <div className='ml-10 w-1/2 flex items-center'></div>
@@ -54,21 +47,22 @@ function Root() {
         </div>
       </nav>
 
-      <div className='mt-24'>
-        <div className='pt-20 large-card drop-shadow-md mx-auto px-6 rounded-2xl bg-purple-400'>
+      <div className='large-background bg-cover'>
+        <div className='h-24'></div>
+        <div className='pt-20 text-center large-card drop-shadow-md mx-auto px-6 rounded-2xl bg-purple-400'>
           <div className='font-semibold text-zinc-950 text-5xl mb-16 block'>
             Convert Playlists Seamlessly
           </div>
           <div className='h-24 flex items-center mt-8'>
             <div className='flex container items-center w-96 mx-auto'>
               <div className='h-16 w-16 mx-auto'>
-                <SpotifySvg></SpotifySvg>
+                <SpotifySvg height='4rem' width='4rem'></SpotifySvg>
               </div>
               <div className='h-16 w-16 mx-auto'>
                 <DoubleArrowSvg></DoubleArrowSvg>
               </div>
               <div className='h-16 w-16 mx-auto'>
-                <YoutubeSvg></YoutubeSvg>
+                <YoutubeSvg height='4rem' width='4rem'></YoutubeSvg>
               </div>
             </div>
           </div>
@@ -81,40 +75,37 @@ function Root() {
             <a href="/signup"><button className='text-black bg-purple-500'>Convert Now</button></a>
           </div>
         </div>
+        <div className='h-24'></div>
       </div>
-
-      <div className='section bg-cyan-600 mt-40 pt-16 text-zinc-950'>
+      <div className='h-24 bg-cyan-500'></div>
+      <div className='section bg-cover pt-16 text-purple-500'>
         <div>
-          {/* <div className='mt-20 h-20'></div> */}
           <div className='text-5xl ml-16 h-20 text-justify'>How it works</div>
         </div>
         <div>
-          <div className='columns-3 mt-10 text-lg px-10'>
-            <div>
+          <div className='columns-3 mt-10 text-lg px-10 text-center'>
+            <div className=''>
               <div>
-                <ConnectSvg></ConnectSvg>
+                <ConnectSvg height='10rem' width='10rem' stroke='#922BE0'></ConnectSvg>
               </div>
-              <div>Connect to your Youtube and Spotify accounts</div>
+              <h2 className='description-text'>Connect to your Youtube and Spotify accounts</h2>
             </div>
             <div>
               <div>
-                <SelectSvg></SelectSvg>
+                <SelectSvg height='10rem' width='10rem' stroke='#922BE0'></SelectSvg>
               </div>
               <div>Pick the playlist you want to convert</div>
             </div>
             <div>
               <div>
-                <CircleArrowsSvg></CircleArrowsSvg>
+                <CircleArrowsSvg height='10rem' width='10rem' stroke='#922BE0'></CircleArrowsSvg>
               </div>
               <div>Convert!</div>
             </div>
           </div>
         </div>
       </div>
-        
-
       <div className=' footer outline outline-1 outline-white mt-20'>
-
       </div>
     </div>
   )

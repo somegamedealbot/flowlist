@@ -1,6 +1,12 @@
-export function SpotifySvg(){
+interface SvgProps{
+	height: string,
+	width: string,
+	stroke?: string
+}
+
+export function SpotifySvg(props: SvgProps){
     return (
-        <svg fill="#000000" height="4rem" width="4rem" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 305 305" xmlSpace="preserve">
+        <svg fill="#000000" height={props.height} width={props.width} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 305 305" xmlSpace="preserve">
 <g id="XMLID_85_">
 	<path id="XMLID_86_" d="M152.441,0C68.385,0,0,68.39,0,152.453C0,236.568,68.385,305,152.441,305
 		C236.562,305,305,236.568,305,152.453C305,68.39,236.562,0,152.441,0z M75.08,208.47c17.674-5.38,35.795-8.108,53.857-8.108
@@ -21,9 +27,9 @@ export function SpotifySvg(){
     )
 }
 
-export function YoutubeSvg(){
+export function YoutubeSvg(props: SvgProps){
     return(
-        <svg fill="#000000" width="4rem" height="4rem" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <svg fill="#000000" height={props.height} width={props.width} viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
 <title>youtube</title>
 <path d="M12.932 20.459v-8.917l7.839 4.459zM30.368 8.735c-0.354-1.301-1.354-2.307-2.625-2.663l-0.027-0.006c-3.193-0.406-6.886-0.638-10.634-0.638-0.381 0-0.761 0.002-1.14 0.007l0.058-0.001c-0.322-0.004-0.701-0.007-1.082-0.007-3.748 0-7.443 0.232-11.070 0.681l0.434-0.044c-1.297 0.363-2.297 1.368-2.644 2.643l-0.006 0.026c-0.4 2.109-0.628 4.536-0.628 7.016 0 0.088 0 0.176 0.001 0.263l-0-0.014c-0 0.074-0.001 0.162-0.001 0.25 0 2.48 0.229 4.906 0.666 7.259l-0.038-0.244c0.354 1.301 1.354 2.307 2.625 2.663l0.027 0.006c3.193 0.406 6.886 0.638 10.634 0.638 0.38 0 0.76-0.002 1.14-0.007l-0.058 0.001c0.322 0.004 0.702 0.007 1.082 0.007 3.749 0 7.443-0.232 11.070-0.681l-0.434 0.044c1.298-0.362 2.298-1.368 2.646-2.643l0.006-0.026c0.399-2.109 0.627-4.536 0.627-7.015 0-0.088-0-0.176-0.001-0.263l0 0.013c0-0.074 0.001-0.162 0.001-0.25 0-2.48-0.229-4.906-0.666-7.259l0.038 0.244z"></path>
 </svg>
@@ -46,17 +52,31 @@ export function DoubleArrowSvg(){
 	)
 }
 
-export function CircleArrowsSvg(){
+export function CircleArrowsSvg(props: SvgProps){
 	return (
-		<svg className="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="10rem" height="10rem" viewBox="0 0 50 50">
+		<svg className="mx-auto" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" fill={props.stroke ? props.stroke : ''} width={props.width} height={props.height} viewBox="0 0 50 50">
 		<path d="M 25 5 C 13.964844 5 5 13.964844 5 25 C 4.996094 25.359375 5.183594 25.695313 5.496094 25.878906 C 5.808594 26.058594 6.191406 26.058594 6.503906 25.878906 C 6.816406 25.695313 7.003906 25.359375 7 25 C 7 15.046875 15.046875 7 25 7 C 31.246094 7 36.726563 10.179688 39.957031 15 L 33 15 C 32.640625 14.996094 32.304688 15.183594 32.121094 15.496094 C 31.941406 15.808594 31.941406 16.191406 32.121094 16.503906 C 32.304688 16.816406 32.640625 17.003906 33 17 L 43 17 L 43 7 C 43.003906 6.730469 42.898438 6.46875 42.707031 6.277344 C 42.515625 6.085938 42.253906 5.980469 41.984375 5.984375 C 41.433594 5.996094 40.992188 6.449219 41 7 L 41 13.011719 C 37.347656 8.148438 31.539063 5 25 5 Z M 43.984375 23.984375 C 43.433594 23.996094 42.992188 24.449219 43 25 C 43 34.953125 34.953125 43 25 43 C 18.753906 43 13.269531 39.820313 10.042969 35 L 17 35 C 17.359375 35.007813 17.695313 34.816406 17.878906 34.507813 C 18.058594 34.195313 18.058594 33.808594 17.878906 33.496094 C 17.695313 33.1875 17.359375 32.996094 17 33 L 8.445313 33 C 8.316406 32.976563 8.1875 32.976563 8.058594 33 L 7 33 L 7 43 C 6.996094 43.359375 7.183594 43.695313 7.496094 43.878906 C 7.808594 44.058594 8.191406 44.058594 8.503906 43.878906 C 8.816406 43.695313 9.003906 43.359375 9 43 L 9 36.984375 C 12.648438 41.847656 18.460938 45 25 45 C 36.035156 45 45 36.035156 45 25 C 45.003906 24.730469 44.898438 24.46875 44.707031 24.277344 C 44.515625 24.085938 44.253906 23.980469 43.984375 23.984375 Z"></path>
 		</svg>
 	)
 }
 
-export function ConnectSvg(){
+export function UserIcon(props: SvgProps){
 	return (
-		<svg className="mx-auto" fill="#000000" height="10rem" width="10rem" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 303.374 303.374" xmlSpace="preserve">
+		<svg height={props.height} width={props.width} stroke={props.stroke ? props.stroke : ''} version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 60.671 60.671" xmlSpace="preserve">
+		<g>
+			<g>
+				<ellipse style={{fill:"#010002"}} cx="30.336" cy="12.097" rx="11.997" ry="12.097"/>
+				<path style={{fill:"#010002"}} d="M35.64,30.079H25.031c-7.021,0-12.714,5.739-12.714,12.821v17.771h36.037V42.9
+					C48.354,35.818,42.661,30.079,35.64,30.079z"/>
+			</g>
+		</g>
+		</svg>
+	)
+}
+
+export function ConnectSvg(props: SvgProps){
+	return (
+		<svg className="mx-auto" fill={props.stroke ? props.stroke : ''} width={props.width} height={props.height}  version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 303.374 303.374" xmlSpace="preserve">
 		<g>
 		<path d="M268.291,177.313c-4.144,0-8.12,0.727-11.814,2.052l-17.319-27.524c10.331-10.171,16.751-24.302,16.751-39.91
 			c0-30.899-25.138-56.037-56.037-56.037s-56.037,25.138-56.037,56.037c0,12.226,3.947,23.54,10.617,32.762l-33.742,33.954
@@ -75,12 +95,12 @@ export function ConnectSvg(){
 	)
 }
 
-export function SelectSvg(){
+export function SelectSvg(props: SvgProps){
 	return (
-		<svg className="mx-auto" version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="10rem" height="10rem" viewBox="0 0 32 32" xmlSpace="preserve" fill="#000000">
+		<svg className="mx-auto" version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width={props.width} height={props.height} stroke={props.stroke ? props.stroke : ''} viewBox="0 0 32 32" xmlSpace="preserve">
 		<g id="SVGRepo_bgCarrier" stroke-width="0"/>
 		<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-		<g id="SVGRepo_iconCarrier"> <style type="text/css"> .duotone_twee{"{fill:#555D5E;}"} .duotone_een{"{fill:#0B1719;}"} .st0{"{fill:none;}"} </style> <g> <path className="duotone_een" d="M17.837,22.471l2.116-2.268c0.215-0.23,0.587-0.207,0.772,0.05l4.693,6.539 c0.161,0.225,0.474,0.275,0.698,0.115l0.676-0.485c0.224-0.161,0.276-0.473,0.115-0.698l-4.693-6.539 c-0.184-0.256-0.087-0.617,0.2-0.747l2.889-1.308c0.355-0.161,0.398-0.648,0.076-0.868l-10.301-7.04 c-0.373-0.255-0.866,0.076-0.771,0.518l2.677,12.496C17.067,22.628,17.561,22.767,17.837,22.471z"/> <path className="duotone_twee" d="M4,11.5v-6C4,5.224,4.224,5,4.5,5h6C10.776,5,11,5.224,11,5.5v6c0,0.276-0.224,0.5-0.5,0.5h-6 C4.224,12,4,11.776,4,11.5z M13.328,9.948c-0.095-0.446,0.013-0.903,0.297-1.255c0.288-0.357,0.715-0.561,1.171-0.561 c0.301,0,0.593,0.091,0.845,0.263L19,10.691V5.5C19,5.224,18.776,5,18.5,5h-6C12.224,5,12,5.224,12,5.5v6 c0,0.276,0.224,0.5,0.5,0.5h1.267L13.328,9.948z M20.915,12H26.5c0.276,0,0.5-0.224,0.5-0.5v-6C27,5.224,26.776,5,26.5,5h-6 C20.224,5,20,5.224,20,5.5v5.875L20.915,12z"/> </g> </g>
+		<g id="SVGRepo_iconCarrier"> <style type="text/css"> .duotone_twee{"{fill:#74627a;}"} .duotone_een{"{fill:#922BE0;}"} .st0{"{fill:none;}"} </style> <g> <path className="duotone_een" d="M17.837,22.471l2.116-2.268c0.215-0.23,0.587-0.207,0.772,0.05l4.693,6.539 c0.161,0.225,0.474,0.275,0.698,0.115l0.676-0.485c0.224-0.161,0.276-0.473,0.115-0.698l-4.693-6.539 c-0.184-0.256-0.087-0.617,0.2-0.747l2.889-1.308c0.355-0.161,0.398-0.648,0.076-0.868l-10.301-7.04 c-0.373-0.255-0.866,0.076-0.771,0.518l2.677,12.496C17.067,22.628,17.561,22.767,17.837,22.471z"/> <path className="duotone_twee" d="M4,11.5v-6C4,5.224,4.224,5,4.5,5h6C10.776,5,11,5.224,11,5.5v6c0,0.276-0.224,0.5-0.5,0.5h-6 C4.224,12,4,11.776,4,11.5z M13.328,9.948c-0.095-0.446,0.013-0.903,0.297-1.255c0.288-0.357,0.715-0.561,1.171-0.561 c0.301,0,0.593,0.091,0.845,0.263L19,10.691V5.5C19,5.224,18.776,5,18.5,5h-6C12.224,5,12,5.224,12,5.5v6 c0,0.276,0.224,0.5,0.5,0.5h1.267L13.328,9.948z M20.915,12H26.5c0.276,0,0.5-0.224,0.5-0.5v-6C27,5.224,26.776,5,26.5,5h-6 C20.224,5,20,5.224,20,5.5v5.875L20.915,12z"/> </g> </g>
 		</svg>
 	)
 }

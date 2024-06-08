@@ -27,7 +27,7 @@ function Login() {
   return (
     <div className="App">
       <div className='flex min-h-screen'>
-        <div className='h-full filler '>
+        <div className='h-full filler'>
           <div className='min-h-screen w-full bg-purple-500 border-violet-100'></div>
         </div>
         <div className='h-full'>

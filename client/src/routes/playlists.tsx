@@ -3,6 +3,8 @@ import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsePlaylistsData";
+import { UserIcon } from "../components/icons";
+import LogoutBtn from "../components/logoutBtn";
 
 interface PlaylistProps {
     apiService: string
@@ -36,8 +38,11 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
             return <div className="card" id={item.id}>
             <div className="card__container">
                 <div className="card__image-container">
-                    <img className="card__image" src={item.imageUrl} alt={item.id + '-img'} />
-                    <a className="card__image-overlay" onClick={() => navigate(`/convert-playlist/${apiService}/${item.id}`)}>
+                    <img className="card__image overflow-clip" src={item.imageUrl} alt={item.id + '-img'} />
+                    <a href="" className="card__image-overlay" onClick={(event) => {
+                            event.preventDefault()
+                            navigate(`/convert-playlist/${apiService}/${item.id}`)}
+                        }>
                         <div className="card__overlay-text-container">
                             <span className="card__image-overlay-text">Convert</span>
                         </div>
@@ -55,12 +60,16 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
         return <div></div>
     }
     else{
-        return <div>
-            <div>Your {`${apiService}`} Playlists</div>
-            <div className="card__grid-container">
-                {renderPlaylists()}
+        return <div className="w-full h-full">
+            <div className="ml-10 mt-5">
+                <div className="text-3xl">Your {`${apiService.charAt(0).toUpperCase() + apiService.slice(1)}`} Playlists</div>
             </div>
-            <div>
+            <div className="card__grid mt-8">
+                <div className="card__grid-container">
+                    {renderPlaylists()}
+                </div>
+            </div>
+            <div className="pagenation">
                 <div className="pagenation__container">
                     <button disabled={pageData.prevPage ? false : true } className="pagenation__nav-btn" onClick={() => previousPage()}>&larr;</button>
                         <div className="pagenation__page">
@@ -88,7 +97,7 @@ export function Playlists({apiService} : PlaylistProps){
         if (Object.keys(params).length === 0 || params.page === '1'){
             url = `/user/${apiService}-playlists`;
         }
-        else {
+        else { 
             url = `/user/${apiService}-playlists/?pageToken=${params.token}`
         }
         Config.axiosInstance().get(url)
@@ -105,8 +114,40 @@ export function Playlists({apiService} : PlaylistProps){
     }, [apiService, auth, navigate, params]);
     
     return <div className="page-content">
-        <div>Playlists</div>
-        <button onClick={() => navigate('/home')}>Home</button>
+            <nav className='block static 100vw outline outline-1 outline-cyan-500'>
+            <div className='h-4/5'>
+            <div className='flex h-20 px-4'>
+                <div className='w-36 flex items-center'>
+                <div className='mx-auto text-3xl text-purple-500'>Flowlist</div>
+                </div>
+                <div className='ml-10 w-1/2 flex items-center'>
+                <div className="mx-5">
+                    <a className='text-cyan-600 hover:text-cyan-600' href='/home'>Home</a>
+                </div>
+                <div className="mx-5">
+                    <a className='text-cyan-600 hover:text-cyan-600' href='/youtube-playlists'>Youtube Playlists</a>
+                </div>
+                <div className="mx-5">
+                    <a className='text-cyan-600 hover:text-cyan-600' href='/spotify-playlists'>Spotify Playlists</a>
+                </div>
+                {/* <a onClick={() => navigate('/youtube-playlists')}>Youtube Playlists</a>
+                <a onClick={() => navigate('/spotify-playlists')}>Spotify Playlists</a> */}
+                </div>
+                <div className='grow h-0'></div>
+                <div className='min-w-min w-auto flex items-center'>
+                <div className='mr-6 rounded-full bg-purple-500 border-2 border-black h-11 w-11 content-center justify-center flex items-center'>
+                    <UserIcon height="2rem" width="2rem"></UserIcon>
+                    {/* <a href="/signup"><button className='bg-purple-500 text-black'>Sign Up</button></a> */}
+                </div>
+                <div>
+                    <LogoutBtn></LogoutBtn>
+                </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+        {/* <div>Playlists</div>
+        <button onClick={() => navigate('/home')}>Home</button> */}
         <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
             apiService={apiService} page={params.page ? parseInt(params.page) : 1}></StaticPage>
     </div>
