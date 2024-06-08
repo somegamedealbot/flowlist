@@ -55,7 +55,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage></ErrorPage>
   },
   {
-    path: '/spotify-playlists/:page?/:token?',
+    path: '/spotify-playlists/:page?/:token?', // ISSUE WITH ROUTE MATCHING MATCHING FOR TOKEN
     element: <Playlists apiService = 'spotify'></Playlists>,
     errorElement: <ErrorPage></ErrorPage>
   },
