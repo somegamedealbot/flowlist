@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsePlaylistsData";
 import { UserIcon } from "../components/icons";
 import LogoutBtn from "../components/logoutBtn";
+// import ErrorPage from "./error-page";
 
 interface PlaylistProps {
     apiService: string
@@ -22,20 +23,24 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
     const navigate = useNavigate();
 
     const previousPage = () => {
-        if (pageData.prevPage){
-            navigate(`/${apiService}-playlists/${page - 1}/${pageData.nextPage}`);
+        const q = new URLSearchParams();
+        if (pageData.prevPage) {
+            q.append('token', pageData.prevPage)
+            navigate(`/${apiService}-playlists/${page - 1}?${q.toString()}`);
         }
     }
     
     const nextPage = () => {
-        if (pageData.nextPage){
-            navigate(`/${apiService}-playlists/${page + 1}/${pageData.nextPage}`);
+        const q = new URLSearchParams()
+        if (pageData.nextPage) {
+            q.append('token', pageData.nextPage)
+            navigate(`/${apiService}-playlists/${page + 1}?${q.toString()}`);
         }
     }
 
     const renderPlaylists = () => {
         return pageData.items.map((item) => {
-            return <div className="card" id={item.id}>
+            return <div className="card" key={item.id}>
             <div className="card__container">
                 <div className="card__image-container">
                     <img className="card__image overflow-clip" src={item.imageUrl} alt={item.id + '-img'} />
@@ -87,9 +92,11 @@ export function Playlists({apiService} : PlaylistProps){
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylists | YoutubePlaylists>({} as SpotifyPlaylists);
     const navigate = useNavigate();
     const params = useParams();
+    const q = useSearchParams()[0]
     const auth = useAuth();
-    
+    console.log(q.toString())
     useEffect(() => {
+        // console.log(q)
         if (auth === false){
             navigate('/login')
         }
@@ -98,7 +105,8 @@ export function Playlists({apiService} : PlaylistProps){
             url = `/user/${apiService}-playlists`;
         }
         else { 
-            url = `/user/${apiService}-playlists/?pageToken=${params.token}`
+            const token = q.get('token')
+            url = `/user/${apiService}-playlists/?pageToken=${token}`
         }
         Config.axiosInstance().get(url)
         .then((res) => {
@@ -111,7 +119,7 @@ export function Playlists({apiService} : PlaylistProps){
             }
         })
         
-    }, [apiService, auth, navigate, params]);
+    }, [apiService, auth, navigate, params, q]);
     
     return <div className="page-content">
             <nav className='block static 100vw outline outline-1 outline-cyan-500'>
