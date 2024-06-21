@@ -105,7 +105,7 @@ export function ConvertPlaylist(){
         return <div></div>
     }
     else {
-        return <div>
+        return <div className="">
             <EditModal editing={editing} setEditing={setEditing}></EditModal>
             <div className="convert-page">
                 <div className="background-image-container">
@@ -118,6 +118,7 @@ export function ConvertPlaylist(){
                 <div className="convert-content">
                     <div className="convert-page__info-container">
                         <div className="playlist-info">
+                            <div className="h-4"></div>
                             <div className="playlist-info__img-container">
                                 <img className="playlist-info__playlist-img" src={playlistData.imageUrl} alt="playlist-info__playlist-img"/>
                             </div>
@@ -148,12 +149,17 @@ export function ConvertPlaylist(){
                         </div>
                         <CreatePlaylistForm apiService={params.type ? params.type : ''} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
                     </div>
-                    <div className="margin-spacing"></div>
-                    <div className="track-list">
-                        <EditContext.Provider value = {{editing, setEditing}}>
-                            {<TracksDisplay tracks={playlistData.tracks} searchResults={searchResult}></TracksDisplay>}
-                        </EditContext.Provider>
-                    </div>
+                    {/* <div className="margin-spacing"></div> */}
+                    <EditContext.Provider value = {{editing, setEditing}}>
+                        {<TracksDisplay 
+                            playlistData={playlistData} 
+                            searchResults={searchResult}
+                            setPlaylistData={setPlaylistData}
+                            setSearchResults={setSearchResults}
+                            ></TracksDisplay>}
+                    </EditContext.Provider>
+                    {/* <div className="track-list">
+                    </div> */}
                 </div>
                 
             </div>
@@ -163,51 +169,130 @@ export function ConvertPlaylist(){
 }
 
 interface TracksProps {
-    tracks: Track[]
+    playlistData: Playlist,
     searchResults: SearchResults,
-    // setEditing: 
+    setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
+    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>
 }
 
 interface TrackProp {
     track: Track,
-    trackResult?: TrackResult,
-    index: number
+    playlistData: Playlist,
+    searchResults: SearchResults,
+    index: number,
+    setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
+    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>
 }
 
-function TracksDisplay({tracks, searchResults} : TracksProps){
-    return <div>
+function TracksDisplay({searchResults, playlistData, setSearchResults, setPlaylistData} : TracksProps){
+    return <div className="track-list">
         {
-            tracks.map((track, index) => {
-                const trackResults = searchResults.results;
-                return <Track key={index + track.id} track={track} trackResult={trackResults ? trackResults[index] : undefined} index={index}></Track>
+            playlistData.tracks.map((track, index) => {
+                // const trackResults = searchResults.results;
+                return <Track 
+                    key={index + track.id} 
+                    track={track}
+                    playlistData={playlistData}
+                    searchResults={searchResults}
+                    // trackResult={trackResults ? trackResults[index] : undefined} 
+                    index={index}
+                    setSearchResults={setSearchResults}
+                    setPlaylistData={setPlaylistData}
+                ></Track>
             })
         }
     </div>
 }
 
-function Track({track, trackResult, index} : TrackProp){
+// copy the data
+// modify the data
+const swapTracksData = (index: number, playlistData: Playlist, searchResults: SearchResults, direction: number) =>{
+
+    let swapPosition = index + direction
+    
+    // valid position to swap
+    if (swapPosition < 0) {
+        swapPosition = playlistData.tracks.length - 1
+    }
+    else if (swapPosition > playlistData.tracks.length - 1) {
+        swapPosition = 0
+    }
+
+    const newPlaylistData: Playlist = ({} as Playlist);
+    const newSearchResults: SearchResults = ({} as SearchResults);
+
+    Object.assign(newPlaylistData, playlistData);
+    Object.assign(newSearchResults, searchResults);
+
+    const tracks: Track[] = newPlaylistData.tracks;
+    const trackResults: TrackResult[] = newSearchResults.results;
+    let holdTrack: Track = ({} as Track);
+    let holdTrackRes: TrackResult = ({} as TrackResult);
+
+    holdTrack = playlistData.tracks[index];
+    holdTrackRes = searchResults.results[index];
+
+    tracks[index] = tracks[swapPosition];
+    trackResults[index] = trackResults[swapPosition];
+    tracks[swapPosition] = holdTrack;
+    trackResults[swapPosition] = holdTrackRes;
+
+    console.log([newPlaylistData, newSearchResults]);
+    
+    return [newPlaylistData, newSearchResults] 
+
+}
+
+function Track({track, playlistData, searchResults, index, setPlaylistData, setSearchResults} : TrackProp){
     const {editing, setEditing} = useContext(EditContext);
+
+    const trackResults = searchResults.results
+    const trackResult = trackResults ? trackResults[index] : undefined
+
     return <div id={track.id} className="track-list__row">
         <div className="track-list__position">{index + 1}</div>
-        <div className="track-list__image-col">
-            <img className="track-list__image" src={track.imageUrl} alt={track.title + '-img'} />
+        {/* <div className="w-3"></div> */}
+        <div className="track-list__track-pair">
+            <div className="track-list__track">
+                <img className="track-list__image" src={track.imageUrl} alt={track.title + '-img'} />
+                {/* <div className="track-list__image-col">
+                </div> */}
+                <div className="track-list__title-col">
+                    <a className="track-list__title" href={track.url}>{track.title}</a>
+                </div>
+            </div>
+            {/* <div className="grow"></div> */}
+            {/* <div className="track-list__position item-pad"></div>
+            <div className="w-3 item-pad"></div> */}
+            <div className="track-list__track">
+                <img className="track-list__image" src={trackResult ? 
+                    trackResult.primary.imageUrl : ''
+                } alt={trackResult ? trackResult.primary.title + '-img' : 'placeholder'} />
+                <div className="track-list__title-col">
+                    <a className="track-list__title" href={
+                        trackResult ? trackResult.primary.url : '#'    
+                    }>{trackResult ? trackResult.primary.title : 'Title'}</a>
+                </div>
+            </div>
         </div>
-        <div className="track-list__title-col">
-            <a className="track-list__title" href={track.url}>{track.title}</a>
+        <div className="track-list__small-col mx-auto">
+            <button onClick={() => {
+                const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, -1)
+                setPlaylistData(newPlaylist as Playlist)
+                setSearchResults(newSearch as SearchResults);
+            }}>↑</button>
+            
+            <div onClick={() => {
+                setEditing(true);
+                console.log('set edit')
+            }}><button>Edit</button></div>
+            
+            <button onClick={() => {
+                const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, 1)
+                setPlaylistData(newPlaylist as Playlist)
+                setSearchResults(newSearch as SearchResults);
+            }}>↓</button>
         </div>
-        <div className="track-list__image-col"></div>
-            <img className="track-list__image" src={trackResult ? 
-                trackResult.primary.imageUrl : ''
-            } alt={trackResult ? trackResult.primary.title + '-img' : 'placeholder'} />
-        <div className="track-list__title-col">
-            <a className="track-list__title" href={
-                trackResult ? trackResult.primary.url : '#'    
-            }>{trackResult ? trackResult.primary.title : 'Title'}</a>
-        </div>
-        <div onClick={() => {
-            setEditing(true);
-            console.log('set edit')
-        }} className="track-list__small-col"><button>Edit</button></div>
     </div>
 }
 
@@ -242,19 +327,19 @@ function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
                 navigate(`/converted/${getConvertedType(apiService)}/
                     ${playlistId.trim()}`);
             }
-            console.log(body);
+            // console.log(body);
         }}>
             <div>
                 <div>
                     <label htmlFor="title">New Playlist Title</label>
                 </div>
-                <input required={true} type="text" name="title"/>
+                <input className='px-2 rounded h-8' required={true} type="text" name="title"/>
             </div>
             <div>
                 <div>
                     <label htmlFor="description">Description</label>
                 </div>
-                <input type="text" name="description"/>
+                <input className='px-2 rounded h-8' type="text" name="description"/>
             </div>
             <div>
                 
