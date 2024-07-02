@@ -1,13 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import { Config } from "../helpers/config";
-import { Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSpotifySearchResults, parseYoutubeSearchResults} from "../helpers/parsePlaylistsData";
+import { Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSpotifySearchResults, parseYoutubeSearchResults} from "../helpers/parsing";
 import { useAuth } from "../components/auth";
 import { EditModal } from "../components/editModal";
-
-// type ConvertProps = {
-//     apiService: string
-// }
 
 function getConvertedType(apiService : string){
     if (apiService === 'spotify'){
@@ -71,6 +67,7 @@ export function ConvertPlaylist(){
     const [searchResult, setSearchResults] = useState<SearchResults>({} as SearchResults);
     const [converted, setConverted] = useState<boolean>(false);
     const [editing, setEditing] = useState<boolean>(false);
+    const [editIndex, setEditIndex] = useState<number>(0);
 
     useEffect(() => {
         if (auth === false){
@@ -106,7 +103,12 @@ export function ConvertPlaylist(){
     }
     else {
         return <div className="">
-            <EditModal editing={editing} setEditing={setEditing}></EditModal>
+            <EditModal 
+                editing={editing} setEditing={setEditing} editIndex={editIndex}
+                searchResults={searchResult}
+                setSearchResults={setSearchResults}
+                searchService={getConvertedType(params.type ? params.type : "")}
+                ></EditModal>
             <div className="convert-page">
                 <div className="background-image-container">
                     <img className="background-image" src={playlistData.imageUrl}></img>
@@ -130,7 +132,7 @@ export function ConvertPlaylist(){
                                 {/* <div className="playlist-info__id">id: {playlistData.id}</div> */}
                                 {/* {playlistData.description ? <p className="playlist-info__description">{playlistData.description}</p> : <div></div>} */}
                                 <div className="convert-button">
-                                    <button onClick={async () => {
+                                    <button disabled={converted ? true : false} onClick={async () => {
                                         if (params.type){
                                             const result = await getConvertedData(params.type, extractSearchTokens(playlistData));
                                             setConverted(true);
@@ -156,6 +158,7 @@ export function ConvertPlaylist(){
                             searchResults={searchResult}
                             setPlaylistData={setPlaylistData}
                             setSearchResults={setSearchResults}
+                            setEditIndex={setEditIndex}
                             ></TracksDisplay>}
                     </EditContext.Provider>
                     {/* <div className="track-list">
@@ -172,7 +175,8 @@ interface TracksProps {
     playlistData: Playlist,
     searchResults: SearchResults,
     setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
-    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>
+    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>,
+    setEditIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
 interface TrackProp {
@@ -181,10 +185,11 @@ interface TrackProp {
     searchResults: SearchResults,
     index: number,
     setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
-    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>
+    setPlaylistData: React.Dispatch<React.SetStateAction<Playlist>>,
+    setEditIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
-function TracksDisplay({searchResults, playlistData, setSearchResults, setPlaylistData} : TracksProps){
+function TracksDisplay({searchResults, playlistData, setSearchResults, setPlaylistData, setEditIndex} : TracksProps){
     return <div className="track-list">
         {
             playlistData.tracks.map((track, index) => {
@@ -198,6 +203,7 @@ function TracksDisplay({searchResults, playlistData, setSearchResults, setPlayli
                     index={index}
                     setSearchResults={setSearchResults}
                     setPlaylistData={setPlaylistData}
+                    setEditIndex={setEditIndex}
                 ></Track>
             })
         }
@@ -243,7 +249,7 @@ const swapTracksData = (index: number, playlistData: Playlist, searchResults: Se
 
 }
 
-function Track({track, playlistData, searchResults, index, setPlaylistData, setSearchResults} : TrackProp){
+function Track({track, playlistData, searchResults, index, setPlaylistData, setSearchResults, setEditIndex} : TrackProp){
     const {editing, setEditing} = useContext(EditContext);
 
     const trackResults = searchResults.results
@@ -251,23 +257,17 @@ function Track({track, playlistData, searchResults, index, setPlaylistData, setS
 
     return <div id={track.id} className="track-list__row">
         <div className="track-list__position">{index + 1}</div>
-        {/* <div className="w-3"></div> */}
         <div className="track-list__track-pair">
             <div className="track-list__track">
                 <img className="track-list__image" src={track.imageUrl} alt={track.title + '-img'} />
-                {/* <div className="track-list__image-col">
-                </div> */}
                 <div className="track-list__title-col">
                     <a className="track-list__title" href={track.url}>{track.title}</a>
                 </div>
             </div>
-            {/* <div className="grow"></div> */}
-            {/* <div className="track-list__position item-pad"></div>
-            <div className="w-3 item-pad"></div> */}
             <div className="track-list__track">
                 <img className="track-list__image" src={trackResult ? 
                     trackResult.primary.imageUrl : ''
-                } alt={trackResult ? trackResult.primary.title + '-img' : 'placeholder'} />
+                } alt={trackResult ? trackResult.primary.title + '-img' : ''} />
                 <div className="track-list__title-col">
                     <a className="track-list__title" href={
                         trackResult ? trackResult.primary.url : '#'    
@@ -284,7 +284,7 @@ function Track({track, playlistData, searchResults, index, setPlaylistData, setS
             
             <div onClick={() => {
                 setEditing(true);
-                console.log('set edit')
+                setEditIndex(index)
             }}><button>Edit</button></div>
             
             <button onClick={() => {
@@ -321,13 +321,11 @@ function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
                     };
                 }) 
             }
-            // const body = Object.fromEntries(input);
             const playlistId = await convert(apiService, body);
+            console.log(playlistId);
             if (playlistId){
-                navigate(`/converted/${getConvertedType(apiService)}/
-                    ${playlistId.trim()}`);
+                navigate(`/converted/${getConvertedType(apiService)}/${playlistId}`);
             }
-            // console.log(body);
         }}>
             <div>
                 <div>
@@ -347,7 +345,6 @@ function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){
                 <input defaultChecked={true} type='checkbox' name="private"></input>
             </div>
             <button type="submit" disabled={converted ? false : true}>Create Playlist</button>
-            {/* <input type="submit" value="Create Playlist" /> */}
         </form>
     </div>
 }

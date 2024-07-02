@@ -19,10 +19,10 @@ function Root() {
     .then(() => {
       navigate('/home');
     })
-    .catch(err =>
-      console.log(err)
+    .catch(() =>
+      console.log('No session')
       // do nothing
-    )
+    );
   }, [navigate]);
 
   return (

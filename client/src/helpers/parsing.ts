@@ -150,6 +150,11 @@ export type Track = {
     // duration: string
 }
 
+export enum MusicService {
+    Youtube = 'youtube',
+    Spotify = 'spotify'
+}
+
 export function parseSpotifyPlaylist(playlists: SpotifyPlaylists){
     if (Object.keys(playlists).length === 0){
         return {
