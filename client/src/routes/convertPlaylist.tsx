@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import { Config } from "../helpers/config";
-import { Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSpotifySearchResults, parseYoutubeSearchResults} from "../helpers/parsing";
+import { MusicService, Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSearchResults} from "../helpers/parsing";
 import { useAuth } from "../components/auth";
 import { EditModal } from "../components/editModal";
 
@@ -24,23 +24,24 @@ async function convert(apiService : string, convertData : object){
     })
     .catch((err) => {
         console.log(err);
-        return undefined;
         // throw new Error('unable to create playlist');
+        return undefined;
     })
 }
 
-async function getConvertedData(apiService: string, searchTokens: string[]){
+async function getConvertedData(apiService: MusicService, searchTokens: string[]){
     const searchResult = await Config.axiosInstance().post(`user/convert-data?${new URLSearchParams({
         type: apiService
     }).toString()}`, {searchTokens: searchTokens})
     .then((res) => {
         console.log(res.data);
-        if (apiService === 'spotify'){
-            return parseYoutubeSearchResults(res.data)
-        }
-        else {
-            return parseSpotifySearchResults(res.data);
-        }
+        return parseSearchResults(res.data, getConvertedType(apiService))
+        // if (apiService === 'spotify'){
+        //     return parseYoutubeSearchResults(res.data)
+        // }
+        // else {
+        //     return parseSpotifySearchResults(res.data);
+        // }
     })
     .catch((err) => {
         console.log(err);
@@ -69,24 +70,26 @@ export function ConvertPlaylist(){
     const [editing, setEditing] = useState<boolean>(false);
     const [editIndex, setEditIndex] = useState<number>(0);
 
+    const service = params.type as MusicService
+
     useEffect(() => {
         if (auth === false){
             navigate('/login');
         }
 
-        if (!(params.type && params.playlistId)){
+        if (!(service && params.playlistId)){
             throw new Error('playlistId or playlist type missing');
         }
         const urlParams = new URLSearchParams({
-            type: params.type,
+            type: service,
             playlistId: params.playlistId
         });
         
         Config.axiosInstance().get(`/user/playlist?${urlParams}`)
         .then((res) => {
             console.log(res.data);
-            if (params.type){
-                setPlaylistData(parsePlaylist(res.data, params.type));
+            if (service){
+                setPlaylistData(parsePlaylist(res.data, service));
             }
             else {
                 throw new Error('no playlist type given');
@@ -96,7 +99,7 @@ export function ConvertPlaylist(){
             console.log(err);
             // error handler here
         })
-    }, [setPlaylistData, params, auth, navigate])
+    }, [setPlaylistData, params, auth, navigate, service])
 
     if (Object.keys(playlistData).length === 0){
         return <div></div>
@@ -107,7 +110,7 @@ export function ConvertPlaylist(){
                 editing={editing} setEditing={setEditing} editIndex={editIndex}
                 searchResults={searchResult}
                 setSearchResults={setSearchResults}
-                searchService={getConvertedType(params.type ? params.type : "")}
+                searchService={getConvertedType(service)}
                 ></EditModal>
             <div className="convert-page">
                 <div className="background-image-container">
@@ -133,8 +136,8 @@ export function ConvertPlaylist(){
                                 {/* {playlistData.description ? <p className="playlist-info__description">{playlistData.description}</p> : <div></div>} */}
                                 <div className="convert-button">
                                     <button disabled={converted ? true : false} onClick={async () => {
-                                        if (params.type){
-                                            const result = await getConvertedData(params.type, extractSearchTokens(playlistData));
+                                        if (service){
+                                            const result = await getConvertedData(service, extractSearchTokens(playlistData));
                                             setConverted(true);
                                             console.log(result);
                                             setSearchResults(result);
@@ -149,7 +152,7 @@ export function ConvertPlaylist(){
                                 </div>
                             </div>
                         </div>
-                        <CreatePlaylistForm apiService={params.type ? params.type : ''} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
+                        <CreatePlaylistForm apiService={service} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
                     </div>
                     {/* <div className="margin-spacing"></div> */}
                     <EditContext.Provider value = {{editing, setEditing}}>
@@ -194,7 +197,7 @@ function TracksDisplay({searchResults, playlistData, setSearchResults, setPlayli
         {
             playlistData.tracks.map((track, index) => {
                 // const trackResults = searchResults.results;
-                return <Track 
+                return <TrackDisplay 
                     key={index + track.id} 
                     track={track}
                     playlistData={playlistData}
@@ -204,7 +207,7 @@ function TracksDisplay({searchResults, playlistData, setSearchResults, setPlayli
                     setSearchResults={setSearchResults}
                     setPlaylistData={setPlaylistData}
                     setEditIndex={setEditIndex}
-                ></Track>
+                ></TrackDisplay>
             })
         }
     </div>
@@ -249,7 +252,7 @@ const swapTracksData = (index: number, playlistData: Playlist, searchResults: Se
 
 }
 
-function Track({track, playlistData, searchResults, index, setPlaylistData, setSearchResults, setEditIndex} : TrackProp){
+function TrackDisplay({track, playlistData, searchResults, index, setPlaylistData, setSearchResults, setEditIndex} : TrackProp){
     const {editing, setEditing} = useContext(EditContext);
 
     const trackResults = searchResults.results
@@ -275,23 +278,27 @@ function Track({track, playlistData, searchResults, index, setPlaylistData, setS
                 </div>
             </div>
         </div>
-        <div className="track-list__small-col mx-auto">
-            <button onClick={() => {
-                const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, -1)
-                setPlaylistData(newPlaylist as Playlist)
-                setSearchResults(newSearch as SearchResults);
-            }}>↑</button>
-            
-            <div onClick={() => {
-                setEditing(true);
-                setEditIndex(index)
-            }}><button>Edit</button></div>
-            
-            <button onClick={() => {
-                const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, 1)
-                setPlaylistData(newPlaylist as Playlist)
-                setSearchResults(newSearch as SearchResults);
-            }}>↓</button>
+        <div className="track-list__small-col justify-center">
+            <div className="flex items-center">
+                <button onClick={() => {
+                    const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, -1)
+                    setPlaylistData(newPlaylist as Playlist)
+                    setSearchResults(newSearch as SearchResults);
+                }}>↑</button>
+                
+                <button
+                    onClick={() => {
+                        setEditing(true);
+                        setEditIndex(index)
+                    }}
+                >Edit</button>
+                
+                <button onClick={() => {
+                    const [newPlaylist, newSearch] = swapTracksData(index, playlistData, searchResults, 1)
+                    setPlaylistData(newPlaylist as Playlist)
+                    setSearchResults(newSearch as SearchResults);
+                }}>↓</button>
+            </div>
         </div>
     </div>
 }
@@ -299,7 +306,7 @@ function Track({track, playlistData, searchResults, index, setPlaylistData, setS
 interface FormProps {
     tracksData : SearchResults
     converted : boolean
-    apiService : string
+    apiService : MusicService
 }
 
 function CreatePlaylistForm({tracksData, converted, apiService} : FormProps){

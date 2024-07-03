@@ -13,7 +13,7 @@ interface EditProps{
     editIndex: number,
     searchResults: SearchResults,
     setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
-    searchService: string
+    searchService: MusicService
 }
 
 type SpotifySearchResult = {
@@ -45,8 +45,15 @@ type YoutubeSearchResult = {
     }[]
 }
 
-function parseSearchResult(service: string, data: object){
-    let parsed : SpotifySearchResult | YoutubeSearchResult = {} as YoutubeSearchResult
+type SearchResult = YoutubeSearchResult | SpotifySearchResult
+
+const serviceMapping = {
+    "youtube": (data : SearchResult) => {return data as YoutubeSearchResult},
+    "spotify": (data : SearchResult) => {return data as SpotifySearchResult}
+}
+
+function parseSearchResult(service: string, data: SearchResult){
+    let parsed : SearchResult = {} as SearchResult
     const parsedResults : TrackSearchResults = {} as TrackSearchResults;
 
     if (service == 'youtube'){
@@ -79,28 +86,62 @@ function parseSearchResult(service: string, data: object){
     return parsedResults;
 }
 
-const serviceMapping = {
-    "youtube": (data : object) => {return data as YoutubeSearchResult},
-    "spotify": (data : object) => {return data as SpotifySearchResult}
-}
-
 type SearchDisplayProps = {
     trackSearchResult: TrackSearchResults,
-    searchService: string,
     searchResults: SearchResults,
+    editIndex: number,
+    setEditing: React.Dispatch<React.SetStateAction<boolean>>
     setSearchResults: React.Dispatch<React.SetStateAction<SearchResults>>,
     setSelected: React.Dispatch<React.SetStateAction<number>>
 }
 
-function SearchDisplay({trackSearchResult, searchService, searchResults, setSearchResults, setSelected}: SearchDisplayProps){
-
+function SearchDisplay({trackSearchResult, editIndex, searchResults, setEditing, setSearchResults, setSelected}: SearchDisplayProps){
+    console.log('search component')
+    if (trackSearchResult.tracks) {
+        return <div className="track-search-display px-2">
+            {
+                trackSearchResult.tracks.map((track, i) => {
+                    return <div key={track.id} className="flex h-20 w-full items-center">
+                        <div className="rounded-md w-16">
+                            <img className="rounded border-2 border-black h-16 w-16 object-cover" src={track.imageUrl} alt="track-image"/>
+                        </div>
+                        <div className="w-4"></div>
+                        <div className="flex-grow h-16">
+                            <a className="text-white" href={track.url}>
+                            <div className="track-search-title"><span className="">{track.title}</span>
+                            </div>
+                            </a>
+                        </div>
+                        <div className="w-5 min-w-fit">
+                            <button onClick={() => {
+                                setSelected(i);
+                                let newSearchResults = Object.assign({}, searchResults);
+                                newSearchResults.results[editIndex].primary = trackSearchResult.tracks[i]
+                                setSearchResults(newSearchResults);
+                                setEditing(false)
+                            }}>
+                                Select
+                            </button>
+                        </div>
+                    </div>
+                })            
+            }
+        </div>
+    }
+    
+    else {
+        return <div className="track-search-display">
+        </div>
+    }
+    
 }
 
 export function EditModal({editing, setEditing, editIndex, searchResults, setSearchResults, searchService} : EditProps){
     const [tab, setTab] = useState(0); // tabs if needed in the future
     const [searchTerm, setSearchTerm] = useState("")
     const [selected, setSelected] = useState<number>(0);
-
+    const [trackSearchResult, setTrackSearchResult] = useState<TrackSearchResults>({} as TrackSearchResults)
+    
     return <div className={`edit-modal ${!editing ? 'modal-hidden' : ''}`}
         onClick={(e) => {
             if (e.currentTarget == e.target){
@@ -128,9 +169,9 @@ export function EditModal({editing, setEditing, editIndex, searchResults, setSea
                             withCredentials: true
                         })
                         .then(result => {
-                            const parsed = parseSearchResult(searchService, result.data);
+                            const parsed = parseSearchResult(searchService, result.data as SearchResult);
+                            setTrackSearchResult(parsed);
                             console.log(parsed);
-                            // window.location.replace(result.data.url);
                         })
                         .catch(err => {
                             console.log(err);
@@ -138,9 +179,16 @@ export function EditModal({editing, setEditing, editIndex, searchResults, setSea
                         })
                     }}>Search</button>
                 </div>
+                <SearchDisplay
+                    trackSearchResult={trackSearchResult}
+                    searchResults={searchResults}
+                    setEditing={setEditing}
+                    setSearchResults={setSearchResults}
+                    setSelected={setSelected}
+                    editIndex={editIndex}
+                ></SearchDisplay>
             </div>
             <div className={`edit-modal__panel ${tab === 1 ? 'active' : ''}`}>
-
             </div>
         </div>
     </div>

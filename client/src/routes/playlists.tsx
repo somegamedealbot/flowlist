@@ -2,12 +2,12 @@ import { useEffect, useState } from "react"
 import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsing";
+import {MusicService, Playlists, SpotifyPlaylists, YoutubePlaylists, parsePlaylists } from "../helpers/parsing";
 import NavBar from "../components/navbar";
 // import ErrorPage from "./error-page";
 
 interface PlaylistProps {
-    apiService: string
+    apiService: MusicService
 }
 
 interface StaticPageProps{
@@ -87,13 +87,13 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
 
 }
 
-export function Playlists({apiService} : PlaylistProps){
+export function PlaylistsDisplay({apiService} : PlaylistProps){
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylists | YoutubePlaylists>({} as SpotifyPlaylists);
     const navigate = useNavigate();
     const params = useParams();
     const q = useSearchParams()[0]
     const auth = useAuth();
-    console.log(q.toString())
+    // console.log(q.toString())
     useEffect(() => {
         // console.log(q)
         if (auth === false){
@@ -124,7 +124,7 @@ export function Playlists({apiService} : PlaylistProps){
         <NavBar></NavBar>
         {/* <div>Playlists</div>
         <button onClick={() => navigate('/home')}>Home</button> */}
-        <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
+        <StaticPage pageData={parsePlaylists(playlistsData, apiService)}
             apiService={apiService} page={params.page ? parseInt(params.page) : 1}></StaticPage>
     </div>
 }
