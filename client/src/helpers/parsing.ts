@@ -150,138 +150,120 @@ export type Track = {
     // duration: string
 }
 
-export enum MusicService {
-    Youtube = 'youtube',
-    Spotify = 'spotify'
-}
+export type MusicService = "youtube" | "spotify"
 
-export function parseSpotifyPlaylist(playlists: SpotifyPlaylists){
-    if (Object.keys(playlists).length === 0){
-        return {
-            total: 0,
-            items: [],
-            limit: 0
-        };
-    }
-    const parsedPlaylists: Playlists = {
-        nextPage: playlists.next,
-        prevPage: playlists.previous,
-        total: playlists.total,
-        items: [],
-        limit: playlists.limit
-    }
 
-    parsedPlaylists.items = playlists.items.map<PlaylistOverview>((item) => {
-        const overview: PlaylistOverview = {
-            imageUrl: item.images ? item.images[0] ? item.images[0].url : undefined : undefined,
-            id: item.id,
-            title: item.name,
-            description: item.description
-        } 
-        return overview;
-    });
-
-    return parsedPlaylists;
-}
-
-export function parseYoutubePlaylist(playlists: YoutubePlaylists){
-    if (Object.keys(playlists).length === 0){
-        return {
-            total: 0,
-            items: [],
-            limit: 0
-        };
-    }
-    const parsedPlaylists: Playlists = {
-        nextPage: playlists.nextPageToken,
-        prevPage: playlists.prevPageToken,
-        total: playlists.pageInfo.totalResults,
-        items: [],
-        limit: playlists.pageInfo.resultsPerPage
-    }
-
-    parsedPlaylists.items = playlists.items.map<PlaylistOverview>((item) => {
-        const overview: PlaylistOverview = {
-            imageUrl: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : undefined,
-            id: item.id,
-            title: item.snippet.localized.title,
-            description: item.snippet.localized.description
-        } 
-        return overview;
-    });
-
-    return parsedPlaylists;
-}
-
-export function parsePlaylist(playlist: ModdedYoutubePlaylist | ModdedSpotifyPlaylist, service : string){
-    if (service === 'spotify'){
-        return parseSpotifyTracks(playlist as ModdedSpotifyPlaylist);
-    }
-    return parseYoutubeTracks(playlist as ModdedYoutubePlaylist);
-}
-
-export function parseYoutubeTracks(playlist: ModdedYoutubePlaylist){
-    // if (Object.keys(playlist).length === 0){
-    //     return {
-    //         total: 0,
-    //         items: [],
-    //         limit: 0
-    //     };
-    // }
-
-    const parsedPlaylist: Playlist = {
-        imageUrl: playlist.snippet.thumbnails.medium.url,
-        id: playlist.id,
-        title: playlist.snippet.localized.title,
-        description: playlist.snippet.localized.description,
-        tracks: [],
-        href: `https://www.youtube.com/watch?v=${playlist.id}`
-    }
-    const tracks: Track[] = playlist.items.map((track) => {
-        console.log(track.snippet.thumbnails)
-        return {
-            id: track.snippet.resourceId.videoId,
-            convertToken: modifyYoutubeTitle(track.snippet.title),
-            title: track.snippet.title,
-            url: `https://www.youtube.com/watch?v=${track.snippet.resourceId.videoId}`,
-            imageUrl: track.snippet.thumbnails.medium ? track.snippet.thumbnails.medium.url : undefined
+export function parsePlaylists(playlists: SpotifyPlaylists | YoutubePlaylists, service: MusicService){
+    let parsedPlaylists: Playlists = {} as Playlists
+    if (service == "spotify"){
+        playlists = playlists as SpotifyPlaylists
+        if (Object.keys(playlists).length === 0){
+            return {
+                total: 0,
+                items: [],
+                limit: 0
+            };
         }
-    })
-    parsedPlaylist.tracks = tracks;
-    return parsedPlaylist;
-}
-
-// // add artists to titles
-// function modifySpotifySearchToken(searchToken : string){
-
-// }
-
-// // remove any excess stuff
-// function modifyYoutubeSearchToken(searchToken : string){
-//     return modifyYoutubeTitle(searchToken);
-// }
-
-export function parseSpotifyTracks(playlist: ModdedSpotifyPlaylist){
-    const parsedPlaylist: Playlist = {
-        imageUrl: playlist.images[0].url,
-        id: playlist.id,
-        title: playlist.name,
-        description: playlist.description,
-        href: `https://open.spotify.com/track/${playlist.id}`,
-        tracks: []
-    }
+        parsedPlaylists = {
+            nextPage: playlists.next,
+            prevPage: playlists.previous,
+            total: playlists.total,
+            items: [],
+            limit: playlists.limit
+        }
     
-    const tracks: Track[] = playlist.tracks.map((track) => {
-        return {
-            id: track.track.id,
-            convertToken: modifySpotifyTitle(track.track),
-            title: track.track.name,
-            url: `https://open.spotify.com/track/${track.track.id}`,
-            imageUrl: track.track.album.images[0] ? track.track.album.images[0].url : undefined
+        parsedPlaylists.items = playlists.items.map<PlaylistOverview>((item) => {
+            const overview: PlaylistOverview = {
+                imageUrl: item.images ? item.images[0] ? item.images[0].url : undefined : undefined,
+                id: item.id,
+                title: item.name,
+                description: item.description
+            } 
+            return overview;
+        });
+    }
+
+    else {
+        playlists = playlists as YoutubePlaylists
+        if (Object.keys(playlists).length === 0){
+            return {
+                total: 0,
+                items: [],
+                limit: 0
+            };
         }
-    })
-    parsedPlaylist.tracks = tracks;
+        parsedPlaylists = {
+            nextPage: playlists.nextPageToken,
+            prevPage: playlists.prevPageToken,
+            total: playlists.pageInfo.totalResults,
+            items: [],
+            limit: playlists.pageInfo.resultsPerPage
+        }
+    
+        parsedPlaylists.items = playlists.items.map<PlaylistOverview>((item) => {
+            const overview: PlaylistOverview = {
+                imageUrl: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : undefined,
+                id: item.id,
+                title: item.snippet.localized.title,
+                description: item.snippet.localized.description
+            } 
+            return overview;
+        });
+    
+    }
+    return parsedPlaylists;
+}
+
+export function parsePlaylist(playlist: ModdedYoutubePlaylist | ModdedSpotifyPlaylist, service : MusicService){
+    let parsedPlaylist: Playlist = {} as Playlist
+    
+    if (service === 'spotify'){
+        playlist = playlist as ModdedSpotifyPlaylist
+        parsedPlaylist = {
+            imageUrl: playlist.images[0].url,
+            id: playlist.id,
+            title: playlist.name,
+            description: playlist.description,
+            href: `https://open.spotify.com/track/${playlist.id}`,
+            tracks: []
+        }
+        
+        const tracks: Track[] = playlist.tracks.map((track) => {
+            return {
+                id: track.track.id,
+                convertToken: modifySpotifyTitle(track.track),
+                title: track.track.name,
+                url: `https://open.spotify.com/track/${track.track.id}`,
+                imageUrl: track.track.album.images[0] ? track.track.album.images[0].url : undefined
+            }
+        })
+        parsedPlaylist.tracks = tracks;
+        // return parseSpotifyTracks(playlist as ModdedSpotifyPlaylist);
+    }
+
+    else {
+        playlist = playlist as ModdedYoutubePlaylist
+        parsedPlaylist = {
+            imageUrl: playlist.snippet.thumbnails.medium.url,
+            id: playlist.id,
+            title: playlist.snippet.localized.title,
+            description: playlist.snippet.localized.description,
+            tracks: [],
+            href: `https://www.youtube.com/watch?v=${playlist.id}`
+        }
+        const tracks: Track[] = playlist.items.map((track) => {
+            return {
+                id: track.snippet.resourceId.videoId,
+                convertToken: modifyYoutubeTitle(track.snippet.title),
+                title: track.snippet.title,
+                url: `https://www.youtube.com/watch?v=${track.snippet.resourceId.videoId}`,
+                imageUrl: track.snippet.thumbnails.medium ? track.snippet.thumbnails.medium.url : undefined
+            }
+        })
+        parsedPlaylist.tracks = tracks;
+    }
     return parsedPlaylist;
+    // return parseYoutubeTracks(playlist as ModdedYoutubePlaylist);
 }
 
 export type TrackResult = {
@@ -326,74 +308,78 @@ type YoutubeSearchResults = {
 //     tracks: []
 // }
 
-export function parseSpotifySearchResults(data: SpotifySearchResults){
-    const playlist : SearchResults = {
-        results: data.tracks.map((trackInfo) => {
-            if (trackInfo.deleted){
+export function parseSearchResults(data: SpotifySearchResults | YoutubeSearchResults, service: MusicService){
+    let playlist : SearchResults = {} as SearchResults
+    if (service == "spotify"){
+        data = data as SpotifySearchResults
+        playlist = {
+            results: data.tracks.map((trackInfo) => {
+                if (trackInfo.deleted){
+                    return {
+                        primary: {
+                            id: 'deleted-id',
+                            convertToken: 'deleted',
+                            title: 'deleted',
+                            url: '#',
+                            imageUrl: undefined
+                        },
+                        additional: [],
+                        deleted: true
+                    }
+                }
+                const primary = trackInfo.tracks.items[0];
+                const additional = trackInfo.tracks.items;
                 return {
                     primary: {
-                        id: 'deleted-id',
-                        convertToken: 'deleted',
-                        title: 'deleted',
-                        url: '#',
-                        imageUrl: undefined
+                        id: primary.id,
+                        convertToken: primary.uri,
+                        title: primary.name,
+                        url: primary.external_urls.spotify,
+                        imageUrl: primary.album.images[0] ? primary.album.images[0].url : undefined
                     },
-                    additional: [],
-                    deleted: true
+                    additional: additional.map((option) => {
+                        return {
+                            id: option.id,
+                            convertToken: option.uri,
+                            title: option.name,
+                            url: option.external_urls.spotify,
+                            imageUrl: option.album.images[0] ? option.album.images[0].url : undefined
+                        }
+                    }),
+                    deleted: false
                 }
-            }
-            const primary = trackInfo.tracks.items[0];
-            const additional = trackInfo.tracks.items;
-            return {
-                primary: {
-                    id: primary.id,
-                    convertToken: primary.uri,
-                    title: primary.name,
-                    url: primary.external_urls.spotify,
-                    imageUrl: primary.album.images[0] ? primary.album.images[0].url : undefined
-                },
-                additional: additional.map((option) => {
-                    return {
-                        id: option.id,
-                        convertToken: option.uri,
-                        title: option.name,
-                        url: option.external_urls.spotify,
-                        imageUrl: option.album.images[0] ? option.album.images[0].url : undefined
-                    }
-                }),
-                deleted: false
-            }
-        })
+            })
+        }
     }
-    return playlist;
-}
 
-export function parseYoutubeSearchResults(data: YoutubeSearchResults){
-    const playlist : SearchResults = {
-        results: data.tracks.map((track) => {
-            const primary =  track[0].videoRenderer;
-            const additional = track;
-            return {
-                primary: {
-                    id: primary.videoId,
-                    convertToken: primary.videoId,
-                    title: primary.title.runs[0].text,
-                    url: `https://www.youtube.com/watch?v=${primary.videoId}`,
-                    imageUrl: primary.thumbnail.thumbnails[0] ? primary.thumbnail.thumbnails[0].url : undefined
-                },
-                additional: additional.map((alt) => {
-                    const renderer = alt.videoRenderer; 
-                    return {
-                        id: renderer.videoId,
-                        convertToken: renderer.videoId,
-                        title: renderer.title.runs[0].text,
-                        url: `https://www.youtube.com/watch?v=${renderer.videoId}`,
-                        imageUrl: renderer.thumbnail.thumbnails[0] ? renderer.thumbnail.thumbnails[0].url : undefined
-                    }
-                }),
-                deleted: false
-            }
-        })
+    else {
+        data = data as YoutubeSearchResults
+        playlist = {
+            results: data.tracks.map((track) => {
+                const primary =  track[0].videoRenderer;
+                const additional = track;
+                return {
+                    primary: {
+                        id: primary.videoId,
+                        convertToken: primary.videoId,
+                        title: primary.title.runs[0].text,
+                        url: `https://www.youtube.com/watch?v=${primary.videoId}`,
+                        imageUrl: primary.thumbnail.thumbnails[0] ? primary.thumbnail.thumbnails[0].url : undefined
+                    },
+                    additional: additional.map((alt) => {
+                        const renderer = alt.videoRenderer; 
+                        return {
+                            id: renderer.videoId,
+                            convertToken: renderer.videoId,
+                            title: renderer.title.runs[0].text,
+                            url: `https://www.youtube.com/watch?v=${renderer.videoId}`,
+                            imageUrl: renderer.thumbnail.thumbnails[0] ? renderer.thumbnail.thumbnails[0].url : undefined
+                        }
+                    }),
+                    deleted: false
+                }
+            })
+        }
     }
 
     return playlist
