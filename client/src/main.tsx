@@ -14,6 +14,7 @@ import { ConvertPlaylist } from './routes/convertPlaylist';
 import { Converted } from './routes/converted';
 import SignUp from './routes/sign-up';
 import { Fonts } from './components/fonts'
+import { Toaster, useToaster } from 'react-hot-toast';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -76,9 +77,11 @@ const router = createBrowserRouter([
   // },
 ])
 
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // add strict mode back in production
   <div>
+    <Toaster />
     <Fonts></Fonts>
     <RouterProvider router={router}></RouterProvider>
   </div>

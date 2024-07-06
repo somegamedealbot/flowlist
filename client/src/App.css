@@ -338,6 +338,7 @@ div #track-search-display {
 }
 
 .track-list__title{
+  white-space: nowrap;
   color:aliceblue;
 }
 

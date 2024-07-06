@@ -4,6 +4,7 @@ import { Config } from "../helpers/config";
 import { MusicService, Playlist, SearchResults, Track, TrackResult, extractSearchTokens, parsePlaylist, parseSearchResults} from "../helpers/parsing";
 import { useAuth } from "../components/auth";
 import { EditModal } from "../components/editModal";
+import toast from "react-hot-toast";
 
 function getConvertedType(apiService : string){
     if (apiService === 'spotify'){
@@ -14,40 +15,65 @@ function getConvertedType(apiService : string){
 
 async function convert(apiService : string, convertData : object){
     apiService = getConvertedType(apiService);
-    
-    return await Config.axiosInstance().post(`user/convert?${new URLSearchParams({
-        type: apiService
-    }).toString()}`, convertData)
-    .then((res) => {
-        const playlistId = res.data.id;
-        return playlistId;
+    return await toast.promise(
+        Config.axiosInstance().post(`user/convert?${new URLSearchParams({
+            type: apiService
+        }).toString()}`, convertData)
+        .then((res) => {
+            const playlistId : string = res.data.id;
+            return playlistId;
+        })
+        .catch((err) => {
+            console.log(err);
+            // throw new Error('unable to create playlist');
+            return undefined;
+        }), 
+        {
+            loading: 'Creating new playlist...',
+            success: 'Converted playlist created!',
+            error: 'Could not create playlist.'
+        }
+    )
+    .then((playlistId) => {
+        return playlistId
     })
-    .catch((err) => {
-        console.log(err);
-        // throw new Error('unable to create playlist');
-        return undefined;
+    .catch(() => {
+        return undefined
     })
+    // return await Config.axiosInstance().post(`user/convert?${new URLSearchParams({
+    //     type: apiService
+    // }).toString()}`, convertData)
+    // .then((res) => {
+    //     const playlistId = res.data.id;
+    //     return playlistId;
+    // })
+    // .catch((err) => {
+    //     console.log(err);
+    //     // throw new Error('unable to create playlist');
+    //     return undefined;
+    // })
 }
 
 async function getConvertedData(apiService: MusicService, searchTokens: string[]){
-    const searchResult = await Config.axiosInstance().post(`user/convert-data?${new URLSearchParams({
+    const searchResult = await toast.promise(
+        Config.axiosInstance().post(`user/convert-data?${new URLSearchParams({
         type: apiService
-    }).toString()}`, {searchTokens: searchTokens})
-    .then((res) => {
-        console.log(res.data);
-        return parseSearchResults(res.data, getConvertedType(apiService))
-        // if (apiService === 'spotify'){
-        //     return parseYoutubeSearchResults(res.data)
-        // }
-        // else {
-        //     return parseSpotifySearchResults(res.data);
-        // }
-    })
-    .catch((err) => {
-        console.log(err);
-        throw Error('did not receive search data');
-    });
-
+        }).toString()}`, {searchTokens: searchTokens})
+        .then((res) => {
+            console.log(res.data);
+            return parseSearchResults(res.data, getConvertedType(apiService))
+        })
+        .catch((err) => {
+            console.log(err);
+            return undefined
+        }),
+        {
+            loading: 'Converting playlist...',
+            success: 'Converted!',
+            error: 'Could not convert playlist.'
+        }
+    )
+    
     return searchResult;
 }
 
@@ -138,9 +164,11 @@ export function ConvertPlaylist(){
                                     <button disabled={converted ? true : false} onClick={async () => {
                                         if (service){
                                             const result = await getConvertedData(service, extractSearchTokens(playlistData));
-                                            setConverted(true);
-                                            console.log(result);
-                                            setSearchResults(result);
+                                            if (result){
+                                                setConverted(true);
+                                                console.log(result);
+                                                setSearchResults(result);
+                                            }
                                         }
                                         else {
                                             throw Error('no playlist type given');

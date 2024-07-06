@@ -4,6 +4,8 @@ import { useAuth } from "../components/auth";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {MusicService, Playlists, SpotifyPlaylists, YoutubePlaylists, parsePlaylists } from "../helpers/parsing";
 import NavBar from "../components/navbar";
+import toast from "react-hot-toast";
+
 // import ErrorPage from "./error-page";
 
 interface PlaylistProps {
@@ -107,16 +109,24 @@ export function PlaylistsDisplay({apiService} : PlaylistProps){
             const token = q.get('token')
             url = `/user/${apiService}-playlists/?pageToken=${token}`
         }
-        Config.axiosInstance().get(url)
-        .then((res) => {
-            setPlaylistsData(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-            if (err.response && err.response.data.sessionTimedOut === true){
-                navigate('/login');
+        toast.promise(
+            Config.axiosInstance().get(url)
+            .then((res) => {
+                setPlaylistsData(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.response && err.response.data.sessionTimedOut === true){
+                    navigate('/login');
+                }
+            }),
+            {
+                loading: `Loading ${apiService} playlists...`,
+                success: 'Playlists found',
+                error: `Failed to retrieve ${apiService} playlists.`
             }
-        })
+
+        )
         
     }, [apiService, auth, navigate, params, q]);
     

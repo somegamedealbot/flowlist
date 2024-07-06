@@ -2,6 +2,7 @@ import { useState } from "react"
 import { MusicService, SearchResults, Track } from "../helpers/parsing";
 import axios from "axios";
 import { SpotifyTrack } from "../helpers/parsing";
+import toast from "react-hot-toast";
 // import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 // import {Tab} from '@headlessui/react';
 // import 'react-tabs/style/react-tabs.css';
@@ -115,10 +116,11 @@ function SearchDisplay({trackSearchResult, editIndex, searchResults, setEditing,
                         <div className="w-5 min-w-fit">
                             <button onClick={() => {
                                 setSelected(i);
-                                let newSearchResults = Object.assign({}, searchResults);
+                                const newSearchResults = Object.assign({}, searchResults);
                                 newSearchResults.results[editIndex].primary = trackSearchResult.tracks[i]
                                 setSearchResults(newSearchResults);
                                 setEditing(false)
+                                toast(`Changed conversion of song: ${newSearchResults.results[editIndex].primary.title}`)
                             }}>
                                 Select
                             </button>
@@ -162,6 +164,7 @@ export function EditModal({editing, setEditing, editIndex, searchResults, setSea
                         }}>
                     </input>
                     <button onClick={() => {
+                        toast.promise(
                         axios(`${import.meta.env.VITE_API_SERVICE_URL}/user/search?${new URLSearchParams({
                                 type: searchService,
                                 term: searchTerm
@@ -176,7 +179,13 @@ export function EditModal({editing, setEditing, editIndex, searchResults, setSea
                         .catch(err => {
                             console.log(err);
                             // handle error here
-                        })
+                        }),
+                        {
+                            loading: 'Searching song...',
+                            success: 'Search done!',
+                            error: 'Could not search song.'
+                        }
+                        )
                     }}>Search</button>
                 </div>
                 <SearchDisplay

@@ -5,6 +5,7 @@ import axios from 'axios';
 import fieldChecks from '../helpers/fieldChecks';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function Login() {
   const [emailWarning, setEmailWarning] = useState('');
@@ -45,11 +46,14 @@ function Login() {
                   withCredentials: true
                 })
                 .then(res => {
-                  console.log(res.data);
+                  // console.log(res.data);
+                  toast.success('Logged in.')
                   navigate('/home');
                 })
                 .catch(err => {
+                  
                   console.log(err);
+                  toast.error(`Unable to login: ${err.response.data.message}`);
                   // display error here
                 })
               }
@@ -86,7 +90,7 @@ function Login() {
               </div>
             </Form>
             <div className='mt-10'>
-              <a href='/signup'>Don't have an account? Create one here</a>
+              <a href='/signup'>Don't have an account? <b>Sign up here</b></a>
             </div>
           </div>
         </div>

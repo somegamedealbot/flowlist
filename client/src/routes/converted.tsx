@@ -32,7 +32,7 @@ export function Converted(){
                 <div>Your playlist has been successfully converted</div>
                 <div className="h-5"></div>
                 <div>
-                    <a href={playlistUrl}>Link to your new playlist</a>
+                    <a target="_blank" rel="noopener noreferrer" href={playlistUrl}>Link to your new playlist</a>
                 </div>
             </div>
         </div>
