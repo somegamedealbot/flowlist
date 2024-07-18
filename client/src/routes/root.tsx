@@ -41,7 +41,7 @@ function Root() {
               <div className='grow h-0'></div>
               <div className='min-w-min w-auto flex items-center'>
                 <div className='mr-6'>
-                  <a href="/signup"><button className='bg-purple-500 text-black'>Sign Up</button></a>
+                  <a href="/signup"><button className='bg-purple-500 text-black text-nowrap'>Sign Up</button></a>
                 </div>
                 <div>
                   <a href='/login'><button className='text-cyan-400'>Login</button></a>
@@ -81,35 +81,39 @@ function Root() {
           </div>
           <div className='h-24'></div>
         </div>
-        <div className='h-24 bg-cyan-500'></div>
+        <div className='h-24'></div>
         <div className='section bg-cover pt-16 text-purple-500'>
           <div>
             <div className='text-5xl ml-16 h-20 text-justify'>How it works</div>
           </div>
-          <div>
-            <div className='columns-3 mt-10 text-lg px-10 text-center'>
-              <div className=''>
+          <div className=''>
+            <div className='columns-3 mt-10 text-lg text-center min-h-fit'>
+              <div className='min-h-fit min-w-fit'>
                 <div>
-                  <ConnectSvg height='10rem' width='10rem' stroke='#922BE0'></ConnectSvg>
+                  <ConnectSvg height='9rem' width='9rem' stroke='#922BE0'></ConnectSvg>
                 </div>
-                <h2 className='description-text'>Connect to your Youtube and Spotify accounts</h2>
-              </div>
-              <div>
-                <div>
-                  <SelectSvg height='10rem' width='10rem' stroke='#922BE0'></SelectSvg>
+                <div className=''>
+                  <h2>Connect to your Youtube and Spotify accounts</h2>
                 </div>
-                <div>Pick the playlist you want to convert</div>
               </div>
-              <div>
+              <div className='min-h-fit min-w-fit'>
                 <div>
-                  <CircleArrowsSvg height='10rem' width='10rem' stroke='#922BE0'></CircleArrowsSvg>
+                  <SelectSvg height='9rem' width='9rem' stroke='#922BE0'></SelectSvg>
+                </div>
+                <div className=''>
+                  <h2>Pick the playlist you want to convert</h2>
+                </div>
+              </div>
+              <div className='min-h-fit min-w-fit'>
+                <div>
+                  <CircleArrowsSvg height='9rem' width='9rem' stroke='#922BE0'></CircleArrowsSvg>
                 </div>
                 <div>Convert!</div>
               </div>
             </div>
           </div>
         </div>
-        <div className=' footer outline outline-1 outline-white mt-20'>
+        <div className=' footer outline outline-1 outline-cyan-400 mt-20'>
         </div>
       </div>
     )

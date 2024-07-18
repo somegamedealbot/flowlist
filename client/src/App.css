@@ -583,7 +583,7 @@ div #track-search-display {
 */
 
 .login-container{
-  min-height: 40rem;
+  padding-top: 5rem;
   width: 40rem;
   margin: 0% 3rem;
 }
