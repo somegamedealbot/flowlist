@@ -39,5 +39,5 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
 
     - name: Sync with AWS bucket
-      run: aws s3 sync ./dist $AWS_BUCKET_URL --delete
+      run: aws s3 sync /dist $AWS_BUCKET_URL --delete
   
