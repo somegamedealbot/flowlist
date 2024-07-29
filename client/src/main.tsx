@@ -9,11 +9,12 @@ import ErrorPage from './routes/error-page';
 import Login from './routes/login';
 import Home from './routes/home';
 import { CallbackHandle } from './components/callbackHandles';
-import {Playlists} from './routes/playlists';
+import {PlaylistsDisplay} from './routes/playlists';
 import { ConvertPlaylist } from './routes/convertPlaylist';
 import { Converted } from './routes/converted';
 import SignUp from './routes/sign-up';
 import { Fonts } from './components/fonts'
+import { Toaster, useToaster } from 'react-hot-toast';
 // import { Auth } from './routes/auth'
 
 const router = createBrowserRouter([
@@ -51,12 +52,12 @@ const router = createBrowserRouter([
   },
   {
     path: '/youtube-playlists/:page?/:token?',
-    element: <Playlists apiService = 'youtube'></Playlists>,
+    element: <PlaylistsDisplay apiService = 'youtube'></PlaylistsDisplay>,
     errorElement: <ErrorPage></ErrorPage>
   },
   {
     path: '/spotify-playlists/:page?/:token?', // ISSUE WITH ROUTE MATCHING MATCHING FOR TOKEN
-    element: <Playlists apiService = 'spotify'></Playlists>,
+    element: <PlaylistsDisplay apiService = 'spotify'></PlaylistsDisplay>,
     errorElement: <ErrorPage></ErrorPage>
   },
   {
@@ -76,9 +77,11 @@ const router = createBrowserRouter([
   // },
 ])
 
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // add strict mode back in production
   <div>
+    <Toaster />
     <Fonts></Fonts>
     <RouterProvider router={router}></RouterProvider>
   </div>

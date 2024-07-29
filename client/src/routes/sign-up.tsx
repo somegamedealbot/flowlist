@@ -6,6 +6,7 @@ import '../App.css'
 import { extractFields } from '../helpers/formHelpers';
 import { useEffect, useState } from 'react';
 import fieldChecks from '../helpers/fieldChecks';
+import toast from 'react-hot-toast';
 
 function SignUp() {
   const [emailWarning, setEmailWarning] = useState('');
@@ -46,12 +47,13 @@ function SignUp() {
                     'Content-Type': 'application/json' 
                   }
                 })
-                .then(res => {
-                  console.log(res.data);
+                .then(() => {
+                  // console.log(res.data);
                   navigate('/login');
                 })
                 .catch(err => {
-                  console.log(err);
+                  // console.log(err);
+                  toast.error(`Unable to login: ${err.response.data.message ? err.response.data.message : err.response.data}`);
                   // display error here
                 })
               }
@@ -88,7 +90,7 @@ function SignUp() {
               </div>
             </Form>
             <div className='mt-10'>
-              <a href='/login'>Already have an account? Create one here</a>
+              <a href='/login'>Already have an account? <b>Login here</b></a>
             </div>
           </div>
         </div>

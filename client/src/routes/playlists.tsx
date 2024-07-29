@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { Config } from "../helpers/config";
 import { useAuth } from "../components/auth";
-import { useNavigate, useParams } from "react-router-dom";
-import {Playlists, SpotifyPlaylists, YoutubePlaylists, parseSpotifyPlaylist, parseYoutubePlaylist } from "../helpers/parsePlaylistsData";
-import { UserIcon } from "../components/icons";
-import LogoutBtn from "../components/logoutBtn";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {MusicService, Playlists, SpotifyPlaylists, YoutubePlaylists, parsePlaylists } from "../helpers/parsing";
+import NavBar from "../components/navbar";
+import toast from "react-hot-toast";
 
 interface PlaylistProps {
-    apiService: string
+    apiService: MusicService
 }
 
 interface StaticPageProps{
@@ -22,20 +22,24 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
     const navigate = useNavigate();
 
     const previousPage = () => {
-        if (pageData.prevPage){
-            navigate(`/${apiService}-playlists/${page - 1}/${pageData.nextPage}`);
+        const q = new URLSearchParams();
+        if (pageData.prevPage) {
+            q.append('token', pageData.prevPage)
+            navigate(`/${apiService}-playlists/${page - 1}?${q.toString()}`);
         }
     }
     
     const nextPage = () => {
-        if (pageData.nextPage){
-            navigate(`/${apiService}-playlists/${page + 1}/${pageData.nextPage}`);
+        const q = new URLSearchParams()
+        if (pageData.nextPage) {
+            q.append('token', pageData.nextPage)
+            navigate(`/${apiService}-playlists/${page + 1}?${q.toString()}`);
         }
     }
 
     const renderPlaylists = () => {
         return pageData.items.map((item) => {
-            return <div className="card" id={item.id}>
+            return <div className="card" key={item.id}>
             <div className="card__container">
                 <div className="card__image-container">
                     <img className="card__image overflow-clip" src={item.imageUrl} alt={item.id + '-img'} />
@@ -83,13 +87,15 @@ function StaticPage({pageData, apiService, page} : StaticPageProps){
 
 }
 
-export function Playlists({apiService} : PlaylistProps){
+export function PlaylistsDisplay({apiService} : PlaylistProps){
     const [playlistsData, setPlaylistsData] = useState<SpotifyPlaylists | YoutubePlaylists>({} as SpotifyPlaylists);
     const navigate = useNavigate();
     const params = useParams();
+    const q = useSearchParams()[0]
     const auth = useAuth();
-    
+    // console.log(q.toString())
     useEffect(() => {
+        // console.log(q)
         if (auth === false){
             navigate('/login')
         }
@@ -98,57 +104,36 @@ export function Playlists({apiService} : PlaylistProps){
             url = `/user/${apiService}-playlists`;
         }
         else { 
-            url = `/user/${apiService}-playlists/?pageToken=${params.token}`
+            const token = q.get('token')
+            url = `/user/${apiService}-playlists/?pageToken=${token}`
         }
-        Config.axiosInstance().get(url)
-        .then((res) => {
-            setPlaylistsData(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-            if (err.response.data.sessionTimedOut === true){
-                navigate('/login');
+        toast.promise(
+            Config.axiosInstance().get(url)
+            .then((res) => {
+                setPlaylistsData(res.data);
+            })
+            .catch((err) => {
+                // console.log(err);
+                if (err.response && err.response.data.sessionTimedOut === true){
+                    navigate('/login');
+                }
+                throw new Error('Unable to retrieve playlists');
+            }),
+            {
+                loading: `Loading ${apiService} playlists...`,
+                success: 'Playlists found',
+                error: `Failed to retrieve ${apiService} playlists.`
             }
-        })
+
+        )
         
-    }, [apiService, auth, navigate, params]);
+    }, [apiService, auth, navigate, params, q]);
     
     return <div className="page-content">
-            <nav className='block static 100vw outline outline-1 outline-cyan-500'>
-            <div className='h-4/5'>
-            <div className='flex h-20 px-4'>
-                <div className='w-36 flex items-center'>
-                <div className='mx-auto text-3xl text-purple-500'>Flowlist</div>
-                </div>
-                <div className='ml-10 w-1/2 flex items-center'>
-                <div className="mx-5">
-                    <a className='text-cyan-600 hover:text-cyan-600' href='/home'>Home</a>
-                </div>
-                <div className="mx-5">
-                    <a className='text-cyan-600 hover:text-cyan-600' href='/youtube-playlists'>Youtube Playlists</a>
-                </div>
-                <div className="mx-5">
-                    <a className='text-cyan-600 hover:text-cyan-600' href='/spotify-playlists'>Spotify Playlists</a>
-                </div>
-                {/* <a onClick={() => navigate('/youtube-playlists')}>Youtube Playlists</a>
-                <a onClick={() => navigate('/spotify-playlists')}>Spotify Playlists</a> */}
-                </div>
-                <div className='grow h-0'></div>
-                <div className='min-w-min w-auto flex items-center'>
-                <div className='mr-6 rounded-full bg-purple-500 border-2 border-black h-11 w-11 content-center justify-center flex items-center'>
-                    <UserIcon height="2rem" width="2rem"></UserIcon>
-                    {/* <a href="/signup"><button className='bg-purple-500 text-black'>Sign Up</button></a> */}
-                </div>
-                <div>
-                    <LogoutBtn></LogoutBtn>
-                </div>
-                </div>
-            </div>
-            </div>
-        </nav>
+        <NavBar></NavBar>
         {/* <div>Playlists</div>
         <button onClick={() => navigate('/home')}>Home</button> */}
-        <StaticPage pageData={apiService === 'spotify' ? parseSpotifyPlaylist(playlistsData as SpotifyPlaylists)  : parseYoutubePlaylist(playlistsData as YoutubePlaylists)}
+        <StaticPage pageData={parsePlaylists(playlistsData, apiService)}
             apiService={apiService} page={params.page ? parseInt(params.page) : 1}></StaticPage>
     </div>
 }
