@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: aws-s3-deploy-env
     name: Build Vite app
     steps:
     - name: Checkout
