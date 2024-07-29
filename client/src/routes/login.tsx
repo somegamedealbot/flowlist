@@ -18,11 +18,12 @@ function Login() {
     })
     .then(() => {
       navigate('/home');
+      toast.success('Logged in.')
     })
-    .catch(
+    .catch(() => {
+      console.log('No session')
       // do nothing
-      () => console.log('Not Auth')
-    )
+    });
   }, [navigate]);
 
   return (
@@ -45,7 +46,7 @@ function Login() {
                   },
                   withCredentials: true
                 })
-                .then(res => {
+                .then(() => {
                   // console.log(res.data);
                   toast.success('Logged in.')
                   navigate('/home');
@@ -53,7 +54,7 @@ function Login() {
                 .catch(err => {
                   
                   console.log(err);
-                  toast.error(`Unable to login: ${err.response.data.message}`);
+                  toast.error(`Unable to login: ${err.response.data.message ? err.response.data.message : err.response.data}`);
                   // display error here
                 })
               }

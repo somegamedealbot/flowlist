@@ -1,34 +1,12 @@
 
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import '../App.css'
-import { useEffect, useState } from 'react';
 import { SpotifySvg, YoutubeSvg, SelectSvg, ConnectSvg, DoubleArrowSvg, CircleArrowsSvg} from '../components/icons'
-import toast from 'react-hot-toast';
 
 function Root() {
   // const [emailWarning, setEmailWarning] = useState('');
   // const [passwordWarning, setPasswordWarning] = useState('');
-  const navigate = useNavigate();
-  const [verified, setVerified] = useState<boolean>(false)
   // console.log(emailWarning);
 
-  useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/user/`, {
-      withCredentials: true
-    })
-    .then(() => {
-      navigate('/home');
-      toast.success('Logged in.')
-    })
-    .catch(() => {
-      setVerified(true)
-      console.log('No session')
-      // do nothing
-    });
-  }, [navigate]);
-
-  if (verified === true){
     return (
       <div className="App">
         <nav className='block static 100vw outline outline-1 outline-cyan-500'>
@@ -117,11 +95,6 @@ function Root() {
         </div>
       </div>
     )
-  }
-  else {
-    return <div></div>
-  }
-
 }
 
 export default Root

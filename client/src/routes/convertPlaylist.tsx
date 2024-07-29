@@ -25,7 +25,7 @@ async function convert(apiService : string, convertData : object){
         })
         .catch((err) => {
             console.log(err);
-            // throw new Error('unable to create playlist');
+            throw new Error('Unable to create playlist');
             return undefined;
         }), 
         {
@@ -40,18 +40,6 @@ async function convert(apiService : string, convertData : object){
     .catch(() => {
         return undefined
     })
-    // return await Config.axiosInstance().post(`user/convert?${new URLSearchParams({
-    //     type: apiService
-    // }).toString()}`, convertData)
-    // .then((res) => {
-    //     const playlistId = res.data.id;
-    //     return playlistId;
-    // })
-    // .catch((err) => {
-    //     console.log(err);
-    //     // throw new Error('unable to create playlist');
-    //     return undefined;
-    // })
 }
 
 async function getConvertedData(apiService: MusicService, searchTokens: string[]){
@@ -158,8 +146,6 @@ export function ConvertPlaylist(){
                                     <a href={playlistData.href}>{playlistData.title}</a>
                                 </div>
                                 <div className="playlist-info__track-count">{playlistData.tracks.length + ' Tracks'}</div>
-                                {/* <div className="playlist-info__id">id: {playlistData.id}</div> */}
-                                {/* {playlistData.description ? <p className="playlist-info__description">{playlistData.description}</p> : <div></div>} */}
                                 <div className="convert-button">
                                     <button disabled={converted ? true : false} onClick={async () => {
                                         if (service){
@@ -182,7 +168,6 @@ export function ConvertPlaylist(){
                         </div>
                         <CreatePlaylistForm apiService={service} converted={converted} tracksData={searchResult}></CreatePlaylistForm>
                     </div>
-                    {/* <div className="margin-spacing"></div> */}
                     <EditContext.Provider value = {{editing, setEditing}}>
                         {<TracksDisplay 
                             playlistData={playlistData} 
@@ -192,8 +177,6 @@ export function ConvertPlaylist(){
                             setEditIndex={setEditIndex}
                             ></TracksDisplay>}
                     </EditContext.Provider>
-                    {/* <div className="track-list">
-                    </div> */}
                 </div>
                 
             </div>

@@ -47,13 +47,13 @@ function SignUp() {
                     'Content-Type': 'application/json' 
                   }
                 })
-                .then(res => {
+                .then(() => {
                   // console.log(res.data);
                   navigate('/login');
                 })
                 .catch(err => {
                   // console.log(err);
-                  toast.error(`Unable to login: ${err.response.data.message}`);
+                  toast.error(`Unable to login: ${err.response.data.message ? err.response.data.message : err.response.data}`);
                   // display error here
                 })
               }

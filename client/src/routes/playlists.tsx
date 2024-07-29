@@ -6,8 +6,6 @@ import {MusicService, Playlists, SpotifyPlaylists, YoutubePlaylists, parsePlayli
 import NavBar from "../components/navbar";
 import toast from "react-hot-toast";
 
-// import ErrorPage from "./error-page";
-
 interface PlaylistProps {
     apiService: MusicService
 }
@@ -115,10 +113,11 @@ export function PlaylistsDisplay({apiService} : PlaylistProps){
                 setPlaylistsData(res.data);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
                 if (err.response && err.response.data.sessionTimedOut === true){
                     navigate('/login');
                 }
+                throw new Error('Unable to retrieve playlists');
             }),
             {
                 loading: `Loading ${apiService} playlists...`,

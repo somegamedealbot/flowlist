@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 function LogoutBtn(){
 
@@ -7,7 +8,7 @@ function LogoutBtn(){
 
     return (<div>
         <button onClick={() => {
-            axios.get(`${import.meta.env.VITE_API_SERVICE_URL}/logout`, {
+            axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/logout`, {}, {
                 withCredentials: true
             })
             .then(result => {
@@ -16,7 +17,7 @@ function LogoutBtn(){
             })
             .catch(err => {
                 console.log(err);
-                // handle error here
+                toast.error('Unable to log out');
             })
         }}>Logout</button>
     </div>);

@@ -526,14 +526,6 @@ div #track-search-display {
     flex-wrap: wrap;
   }
 
-  .track-list__title{
-    /* font-size: 12px; */
-  }
-
-  /* .track-list__title-col{
-    width: 24rem;
-  } */
-
   .track-search-title{
     width: 10em;
   }
