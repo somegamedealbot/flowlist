@@ -42,5 +42,5 @@ jobs:
       working-directory: ./client
       run: | 
         ls
-        aws s3 sync /dist $AWS_BUCKET_URL --delete
+        aws s3 sync dist/ $AWS_BUCKET_URL --delete
   
